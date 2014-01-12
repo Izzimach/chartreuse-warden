@@ -8,7 +8,7 @@ pc.script.create('shapeshifter', function (context) {
 
     var ShapeShifter = function (entity) {
         this.entity = entity;
-        this.shapes = [];
+        this.shapes = {};
         this.activeshape = false;
     };
 
@@ -19,10 +19,15 @@ pc.script.create('shapeshifter', function (context) {
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
+            if (this.activeshape) {
+
+            }
         },
 
         addShape: function(shapecomponent) {
-            this.shapes.push(shapecomponent);
+            var shapename = shapecomponent.shapename;
+            this.shapes[shapename] = shapecomponent;
+
             if (this.activeshape === false) {
                 this.switchShape(shapecomponent.shapename);
             }
@@ -30,12 +35,17 @@ pc.script.create('shapeshifter', function (context) {
         },
 
         switchShape: function(shapename) {
-            if (this.activeshape) {
-                this.activeshape.setActiveFlag(false);
-            }
-
             // find the new shape
-            var newshape = _.
+            var newshapecomponent = this.shapes[shapename];
+            if (newshapecomponent) {
+                // disable old shape before switching to the new one
+                if (this.activeshape) {
+                    this.activeshape.setActiveFlag(false);
+                }
+
+                this.activeshape = newshapecomponent;
+                newshapecomponent.setActiveFlag(true);
+            }
         }
         
     };

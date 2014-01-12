@@ -9,7 +9,7 @@
 // a JSON object mapping from common animation names like 'idle','walk' to the actual
 // animation data. animation data is another map with keys 'name','playspeed', and 'duration'
 //
-pc.script.attribute('animationmap','string', "{idle:{name:'idle_anim', playspeed:1, duration:1}}");
+pc.script.attribute('animationmapJSON','string', '{"idle":{"name":"idle_anim", "playspeed":1, "duration":1}}');
 
 pc.script.create('animationthunk', function (context) {
 
@@ -25,6 +25,7 @@ pc.script.create('animationthunk', function (context) {
     AnimationThunk.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
+            this.animationmap = JSON.parse(this.animationmapJSON);
         },
 
         // Called every frame, dt is time in seconds since last update

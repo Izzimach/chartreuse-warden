@@ -1,6 +1,6 @@
-//pc.script.attribute('shakeMagnifier','number',0.1);
-//pc.script.attribute('shakeDamping','number',1);
-//pc.script.attribute('shakeSpringConstant','number',0.01);
+pc.script.attribute('shakeMagnifier','number',2);
+pc.script.attribute('shakeDamping','number',12);
+pc.script.attribute('shakeSpringConstant','number',700);
 
 pc.script.create('shakeycamera', function (context) {
     // Creates a new Shakeycamera instance
@@ -9,10 +9,6 @@ pc.script.create('shakeycamera', function (context) {
         this.shakevalue = 0.0;
         this.shakevelocity = 0.0;
         
-        this.shakeMagnifier = 2;
-        this.shakeDamping = 12;
-        this.shakeSpringConstant = 700;
-
         this.baserotation = pc.math.quat.create();
         pc.math.quat.copy(this.entity.getLocalRotation(), this.baserotation);
         this.shakerotation = pc.math.quat.create();
