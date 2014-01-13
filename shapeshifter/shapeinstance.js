@@ -31,7 +31,14 @@ pc.script.create('shapeinstance', function (context) {
         update: function (dt) {
             if (!this.isactive) { return; }
 
-            this.animationthunk.setDefaultAnimation('idle');
+            // switch between running and idle animations as appropriate
+            if (this.shapeshiftercomponent.avatarmovementcomponent) {
+                if (this.shapeshiftercomponent.avatarmovementcomponent.ismoving) {
+                    this.animationthunk.setDefaultAnimation('run');
+                } else {
+                    this.animationthunk.setDefaultAnimation('idle');
+                }
+            }
         },
 
         setActiveFlag: function(activeflag) {

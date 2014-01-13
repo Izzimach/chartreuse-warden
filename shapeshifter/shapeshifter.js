@@ -3,6 +3,7 @@
 // Sort of manages the various availabe shapes and switches between them.
 //
 pc.script.attribute('defaultanimationname','string','idle');
+pc.script.attribute('startshapename','string','StartShape');
 
 pc.script.create('shapeshifter', function (context) {
 
@@ -10,17 +11,30 @@ pc.script.create('shapeshifter', function (context) {
         this.entity = entity;
         this.shapes = {};
         this.activeshape = false;
+        this.avatarmovementcomponent = null;
+        this.startshapename = 'StartShape';
     };
 
     ShapeShifter.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
+            this.avatarmovementcomponent = this.entity.script.send('avatarmovement','getComponentReference');
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
             if (this.activeshape) {
+            }
 
+            // switch shapes?
+            if (context.keyboard.wasPressed(pc.input.KEY_Q)) {
+                this.switchShape("GirlShape");
+            }
+            if (context.keyboard.wasPressed(pc.input.KEY_W)) {
+                this.switchShape("BearShape");
+            }
+            if (context.keyboard.wasPressed(pc.input.KEY_E)) {
+                this.switchShape("LeopardShape");
             }
         },
 
@@ -28,7 +42,7 @@ pc.script.create('shapeshifter', function (context) {
             var shapename = shapecomponent.shapename;
             this.shapes[shapename] = shapecomponent;
 
-            if (this.activeshape === false) {
+            if (shapename === this.startshapename) {
                 this.switchShape(shapecomponent.shapename);
             }
             return this;
