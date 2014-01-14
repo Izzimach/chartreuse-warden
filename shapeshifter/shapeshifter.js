@@ -3,7 +3,7 @@
 // Sort of manages the various availabe shapes and switches between them.
 //
 pc.script.attribute('defaultanimationname','string','idle');
-pc.script.attribute('startshapename','string','StartShape');
+pc.script.attribute('shapenamesJSON','string','["GirlShape"]');
 
 pc.script.create('shapeshifter', function (context) {
 
@@ -12,7 +12,8 @@ pc.script.create('shapeshifter', function (context) {
         this.shapes = {};
         this.activeshape = false;
         this.avatarmovementcomponent = null;
-        this.startshapename = 'StartShape';
+        this.shapenames = JSON.parse(this.shapenamesJSON);
+        this.startshapename = this.shapenames[0];;
     };
 
     ShapeShifter.prototype = {
@@ -28,13 +29,16 @@ pc.script.create('shapeshifter', function (context) {
 
             // switch shapes?
             if (context.keyboard.wasPressed(pc.input.KEY_Q)) {
-                this.switchShape("GirlShape");
+                this.switchShape(this.shapenames[0]);
             }
             if (context.keyboard.wasPressed(pc.input.KEY_W)) {
-                this.switchShape("BearShape");
+                this.switchShape(this.shapenames[1]);
             }
             if (context.keyboard.wasPressed(pc.input.KEY_E)) {
-                this.switchShape("LeopardShape");
+                this.switchShape(this.shapenames[1]);
+            }
+            if (context.keyboard.wasPressed(pc.input.KEY_R)) {
+                this.switchShape(this.shapenames[2]);
             }
         },
 
@@ -59,6 +63,8 @@ pc.script.create('shapeshifter', function (context) {
 
                 this.activeshape = newshapecomponent;
                 newshapecomponent.setActiveFlag(true);
+
+                this.avatarmovementcomponent.movespeed = this.activeshape.movespeed;
             }
         }
         
