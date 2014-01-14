@@ -1,6 +1,9 @@
 pc.script.attribute('shakeMagnifier','number',2);
 pc.script.attribute('shakeDamping','number',12);
 pc.script.attribute('shakeSpringConstant','number',700);
+pc.script.attribute('followtargetname','string','Avatar');
+pc.script.attribute('followdistance','number',15);
+
 
 pc.script.create('shakeycamera', function (context) {
     // Creates a new Shakeycamera instance
@@ -17,18 +20,27 @@ pc.script.create('shakeycamera', function (context) {
         this.baseposition = pc.math.vec3.create();
         pc.math.vec3.copy(this.entity.getLocalPosition(), this.baseposition);
         this.shakeposition = pc.math.vec3.create();
+        
         this.modifiedposition = pc.math.vec3.create();
 
         this.shakeaxis = pc.math.vec3.create(1,0,0);
+
+        this.followoffset = pc.math.vec3.create(0,this.followdistance, this.followdistance);
     };
 
     Shakeycamera.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
+            this.followtarget = this.entity.getRoot().findByName(this.followtargetname);
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
+            // if following a target, update the position
+            if (this.followtarget) {
+                pc.math.vec3.add(this.followtarget.getLocalPosition(), this.followoffset, this.baseposition);
+            }
+
             var shakedamping = (1.0 - dt * this.shakeDamping);
             if (shakedamping < 0) { shakedamping = 0; }
             
@@ -41,7 +53,7 @@ pc.script.create('shakeycamera', function (context) {
             
             this.entity.setLocalRotation(this.modifiedrotation);
             
-            pc.math.vec3.set(0,this.shakeposition, this.shakevalue * this.shakeMagnifier, 0);
+            pc.math.vec3.set(0, this.shakeposition, this.shakevalue * this.shakeMagnifier, 0);
             pc.math.vec3.add(this.baseposition, this.shakeposition, this.modifiedposition);
             
             this.entity.setLocalPosition(this.modifiedposition);
