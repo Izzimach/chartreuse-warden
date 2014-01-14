@@ -24,14 +24,13 @@ pc.script.create('shakeycamera', function (context) {
         this.modifiedposition = pc.math.vec3.create();
 
         this.shakeaxis = pc.math.vec3.create(1,0,0);
-
-        this.followoffset = pc.math.vec3.create(0,this.followdistance, this.followdistance);
     };
 
     Shakeycamera.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.followtarget = this.entity.getRoot().findByName(this.followtargetname);
+            this.followoffset = pc.math.vec3.create(0,this.followdistance, this.followdistance);
         },
 
         // Called every frame, dt is time in seconds since last update
