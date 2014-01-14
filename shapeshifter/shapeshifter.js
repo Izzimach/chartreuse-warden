@@ -12,14 +12,15 @@ pc.script.create('shapeshifter', function (context) {
         this.shapes = {};
         this.activeshape = false;
         this.avatarmovementcomponent = null;
-        this.shapenames = JSON.parse(this.shapenamesJSON);
-        this.startshapename = this.shapenames[0];;
     };
 
     ShapeShifter.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.avatarmovementcomponent = this.entity.script.send('avatarmovement','getComponentReference');
+            
+            this.shapenames = JSON.parse(this.shapenamesJSON);
+            this.startshapename = this.shapenames[0];;
         },
 
         // Called every frame, dt is time in seconds since last update
@@ -35,10 +36,13 @@ pc.script.create('shapeshifter', function (context) {
                 this.switchShape(this.shapenames[1]);
             }
             if (context.keyboard.wasPressed(pc.input.KEY_E)) {
-                this.switchShape(this.shapenames[1]);
+                this.switchShape(this.shapenames[2]);
             }
             if (context.keyboard.wasPressed(pc.input.KEY_R)) {
-                this.switchShape(this.shapenames[2]);
+                this.switchShape(this.shapenames[3]);
+            }
+            if (context.keyboard.wasPressed(pc.input.KEY_T)) {
+                this.switchShape(this.shapenames[4]);
             }
         },
 
