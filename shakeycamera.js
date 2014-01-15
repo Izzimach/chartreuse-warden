@@ -59,7 +59,7 @@ pc.script.create('shakeycamera', function (context) {
         },
         
         addShake: function(shakeamplitude) {
-            console.log("shake", shakeamplitude);
+            //console.log("shake", shakeamplitude);
             this.shakevalue = this.shakevalue + shakeamplitude;
         }
     };

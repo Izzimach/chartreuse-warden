@@ -12,15 +12,19 @@ pc.script.create('shapeshifter', function (context) {
         this.shapes = {};
         this.activeshape = false;
         this.avatarmovementcomponent = null;
+        this.particlescomponent = null;
+        this.camera = null;
     };
 
     ShapeShifter.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.avatarmovementcomponent = this.entity.script.send('avatarmovement','getComponentReference');
+            this.particlescomponent = this.entity.script.send('torch','getComponentReference');
+            this.camera = this.entity.getRoot().findByName('Camera');
             
             this.shapenames = JSON.parse(this.shapenamesJSON);
-            this.startshapename = this.shapenames[0];;
+            this.startshapename = this.shapenames[0];
         },
 
         // Called every frame, dt is time in seconds since last update
@@ -57,6 +61,8 @@ pc.script.create('shapeshifter', function (context) {
         },
 
         switchShape: function(shapename) {
+            if (shapename === this.activeshape.shapename) { return; }
+            
             // find the new shape
             var newshapecomponent = this.shapes[shapename];
             if (newshapecomponent) {
@@ -69,6 +75,9 @@ pc.script.create('shapeshifter', function (context) {
                 newshapecomponent.setActiveFlag(true);
 
                 this.avatarmovementcomponent.movespeed = this.activeshape.movespeed;
+                this.particlescomponent.enable();
+                this.particlescomponent.restart();
+                this.camera.script.send('shakeycamera','addShake',2.0);
             }
         }
         

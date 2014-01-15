@@ -11,7 +11,7 @@ pc.script.create('torch', function (context) {
 
     Torch.prototype = {
         initialize: function () {
-            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice);
+            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, positionRange:[3,4,3], colorMult:[0.2,1,0.8,1], startSize:7, endSize:1, lifeTime:0.5});
             this.emitter.meshInstance.node = this.entity;
             
             if (sharedMaterial) {
@@ -21,9 +21,9 @@ pc.script.create('torch', function (context) {
             }
             
             this.emitter.setColorRamp(
-                [253/255, 208/255, 55/255, 1,
-                 207/255, 80/255, 1/255, 1,
-                 0, 0, 0, 1,
+                [100/255, 208/255, 200/255, 1,
+                 0, 200/255, 100/255, 1,
+                 0, 10/255, 0, 1,
                  0, 0, 0, 0.5,
                  0, 0, 0, 0]);
 
@@ -34,21 +34,21 @@ pc.script.create('torch', function (context) {
             context.scene.addModel(this.particleSystem);
             
             var self = this;
-            context.assets.getAssetResource(context.loader, 'flame.jpg', 'image', function (image) {
-                var texture = new pc.gfx.Texture(context.graphicsDevice);
-                texture.minFilter = pc.gfx.FILTER_LINEAR;
-                texture.magFilter = pc.gfx.FILTER_LINEAR;
-                texture.addressU = pc.gfx.ADDRESS_CLAMP_TO_EDGE;
-                texture.addressV = pc.gfx.ADDRESS_CLAMP_TO_EDGE;
-                texture.setSource(image);
-                self.emitter.setColorMap(texture);
-            }.bind(this));
+            /*var flameimage = context.assets.find('flame.jpg', 'image');
+            var texture = new pc.gfx.Texture(context.graphicsDevice);
+            texture.minFilter = pc.gfx.FILTER_LINEAR;
+            texture.magFilter = pc.gfx.FILTER_LINEAR;
+            texture.addressU = pc.gfx.ADDRESS_CLAMP_TO_EDGE;
+            texture.addressV = pc.gfx.ADDRESS_CLAMP_TO_EDGE;
+            texture.setSource(flameimage);
 
-            var game = context.root.findByName('Game');
-            var instance = game.script.getScript('game');
-            instance.on('pause', this.pause, this);
-            instance.on('unpause', this.unpause, this);
+            this.emitter.setColorMap(texture);*/
+
             this.paused = false;
+        },
+
+        getComponentReference: function() {
+            return this;
         },
 
         pause: function () {
@@ -63,6 +63,10 @@ pc.script.create('torch', function (context) {
             if (!this.paused) {
                 this.emitter.addTime(dt);
             }
+        },
+
+        restart: function() {
+            this.emitter.time = 0;
         },
         
         enable: function () {

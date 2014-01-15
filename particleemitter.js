@@ -307,7 +307,7 @@ pc.extend(pc.scene, function () {
         var mesh = new pc.scene.Mesh();
         mesh.vertexBuffer = vertexBuffer;
         mesh.indexBuffer[0] = indexBuffer;
-        mesh.primitive[0].type = pc.gfx.PrimType.TRIANGLES;
+        mesh.primitive[0].type = pc.gfx.PRIMITIVE_TRIANGLES;
         mesh.primitive[0].base = 0;
         mesh.primitive[0].count = indexBuffer.getNumIndices();
         mesh.primitive[0].indexed = true;
@@ -325,7 +325,7 @@ pc.extend(pc.scene, function () {
         this.rampMap = _createTexture(graphicsDevice, 2, 1, [255,255,255,255,255,255,255,0]);
 
         var material = new pc.scene.Material();
-        material.setProgram(program);
+        material.setShader(program);
         material.setParameter('particle_worldVelocity', this.worldVelocity);
         material.setParameter('particle_worldAcceleration', this.worldAcceleration);
         material.setParameter('particle_numFrames', this.numFrames);
@@ -334,12 +334,11 @@ pc.extend(pc.scene, function () {
         material.setParameter('particle_timeOffset', 0);
         material.setParameter('texture_colorMap', this.colorMap);
         material.setParameter('texture_rampMap', this.rampMap);
-        material.setState({
-            cull: false,
-            blend: true,
-            blendModes: { srcBlend: pc.gfx.BLENDMODE_SRC_ALPHA, dstBlend: pc.gfx.BLENDMODE_ONE },
-            depthWrite: false
-        });
+        material.cullMode = pc.gfx.CULLFACE_NONE;
+        material.blend = true;
+        material.blendSrc = pc.gfx.BLENDMODE_SRC_ALPHA;
+        material.blendDst = pc.gfx.BLENDMODE_ONE;
+        material.depthWrite = false;
 
         this.meshInstance = new pc.scene.MeshInstance(null, mesh, material);
         this.meshInstance.layer = pc.scene.LAYER_FX;
