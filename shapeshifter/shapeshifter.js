@@ -75,9 +75,11 @@ pc.script.create('shapeshifter', function (context) {
                 newshapecomponent.setActiveFlag(true);
 
                 this.avatarmovementcomponent.movespeed = this.activeshape.movespeed;
-                this.particlescomponent.enable();
-                this.particlescomponent.restart();
-                this.camera.script.send('shakeycamera','addShake',2.0);
+                if (this.particlescomponent) {
+                    this.particlescomponent.enable();
+                    this.particlescomponent.restart();
+                }
+                this.camera.script.send('shakeycamera','addShake',1.0);
             }
         }
         
