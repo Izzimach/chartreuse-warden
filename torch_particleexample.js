@@ -11,7 +11,7 @@ pc.script.create('torch', function (context) {
 
     Torch.prototype = {
         initialize: function () {
-            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, positionRange:[3,4,3], colorMult:[0.2,1,0.8,1], startSize:7, endSize:1, lifeTime:0.5});
+            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, positionRange: new pc.Vec3(3,4,3), colorMult: new pc.Vec4(0.2,1,0.8,1), startSize:7, endSize:1, lifeTime:0.5});
             this.emitter.meshInstance.node = this.entity;
             
             if (sharedMaterial) {

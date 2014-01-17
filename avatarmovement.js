@@ -38,7 +38,9 @@ pc.script.create("avatarmovement", function (context) {
             }
 
             var p = this.entity.getPosition();
-            this.entity.setPosition(p[0] + dx * dt * this.movespeed, p[1], p[2] + dy * dt * this.movespeed);
+            p.x = p.x + dx * dt * this.movespeed;
+            p.z = p.z + dy * dt * this.movespeed;
+            this.entity.setPosition(p);
 
             // update facing based on movement direction
             this.ismoving = (dx !== 0 || dy !== 0);
