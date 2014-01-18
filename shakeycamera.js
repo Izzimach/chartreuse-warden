@@ -12,33 +12,31 @@ pc.script.create('shakeycamera', function (context) {
         this.shakevalue = 0.0;
         this.shakevelocity = 0.0;
         
-        this.baserotation = pc.math.quat.create();
-        pc.math.quat.copy(this.entity.getLocalRotation(), this.baserotation);
-        this.shakerotation = pc.math.quat.create();
-        this.modifiedrotation = pc.math.quat.create();
-        
-        this.baseposition = pc.math.vec3.create();
-        pc.math.vec3.copy(this.entity.getLocalPosition(), this.baseposition);
-        this.shakeposition = pc.math.vec3.create();
-        
-        this.modifiedposition = pc.math.vec3.create();
+        this.baserotation = this.entity.getLocalRotation().clone();
 
-        this.shakeaxis = pc.math.vec3.create(1,0,0);
+        this.shakerotation = new pc.Quat();
+        this.modifiedrotation = new pc.Quat();
+        
+        this.baseposition = this.entity.getLocalPosition().clone();
+        this.shakeposition = new pc.Vec3();
+        
+        this.modifiedposition = new pc.Vec3();
 
-        this.followoffset = pc.math.vec3.create(0,this.followdistance, this.followdistance);
+        this.shakeaxis = new pc.Vec3(1,0,0);
     };
 
     Shakeycamera.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.followtarget = this.entity.getRoot().findByName(this.followtargetname);
+            this.followoffset = new pc.Vec3(0,this.followdistance, this.followdistance);
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
             // if following a target, update the position
             if (this.followtarget) {
-                pc.math.vec3.add(this.followtarget.getLocalPosition(), this.followoffset, this.baseposition);
+                this.baseposition.add2(this.followtarget.getLocalPosition(), this.followoffset);
             }
 
             var shakedamping = (1.0 - dt * this.shakeDamping);
@@ -46,21 +44,23 @@ pc.script.create('shakeycamera', function (context) {
             
             this.shakevelocity = this.shakevelocity  * shakedamping - this.shakevalue * this.shakeSpringConstant * dt;
             this.shakevalue = this.shakevalue + dt * this.shakevelocity;
+
+            var othershakevalue = this.shakevalue * Math.sin(this.shakevalue);
             
             //pc.math.quat.fromAxisAngle(this.shakeaxis, this.shakevalue * this.shakeMagnifier, this.shakerotation);
-            pc.math.quat.fromEulerXYZ(0,0,this.shakevalue * this.shakeMagnifier,this.shakerotation);
-            pc.math.quat.multiply(this.baserotation, this.shakerotation, this.modifiedrotation);
+            this.shakerotation.setFromEulerAngles(this.shakevalue,this.shakevalue * this.shakeMagnifier,-othershakevalue);
+            this.modifiedrotation.mul2(this.baserotation, this.shakerotation);
             
             this.entity.setLocalRotation(this.modifiedrotation);
             
-            pc.math.vec3.set(0, this.shakeposition, this.shakevalue * this.shakeMagnifier, 0);
-            pc.math.vec3.add(this.baseposition, this.shakeposition, this.modifiedposition);
+            this.shakeposition.set(0,this.shakevalue * this.shakeMagnifier, othershakevalue * this.shakeMagnifier);
+            this.modifiedposition.add2(this.baseposition, this.shakeposition);
             
             this.entity.setLocalPosition(this.modifiedposition);
         },
         
         addShake: function(shakeamplitude) {
-            console.log("shake", shakeamplitude);
+            //console.log("shake", shakeamplitude);
             this.shakevalue = this.shakevalue + shakeamplitude;
         }
     };

@@ -44,7 +44,7 @@ pc.script.create('animationthunk', function (context) {
                 if (!this.isplayingoneshot && playdata) {
                     this.entity.animation.loop = true;
                     this.entity.animation.speed = playdata.playspeed || 1;
-                    this.entity.animation.play(playdata.name);
+                    this.entity.animation.play(playdata.name, 0.1);
                 }
             }
         },
