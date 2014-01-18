@@ -44,14 +44,16 @@ pc.script.create('shakeycamera', function (context) {
             
             this.shakevelocity = this.shakevelocity  * shakedamping - this.shakevalue * this.shakeSpringConstant * dt;
             this.shakevalue = this.shakevalue + dt * this.shakevelocity;
+
+            var othershakevalue = this.shakevalue * Math.sin(this.shakevalue);
             
             //pc.math.quat.fromAxisAngle(this.shakeaxis, this.shakevalue * this.shakeMagnifier, this.shakerotation);
-            this.shakerotation.setFromEulerAngles(0,this.shakevalue * this.shakeMagnifier,0);
+            this.shakerotation.setFromEulerAngles(this.shakevalue,this.shakevalue * this.shakeMagnifier,-othershakevalue);
             this.modifiedrotation.mul2(this.baserotation, this.shakerotation);
             
             this.entity.setLocalRotation(this.modifiedrotation);
             
-            this.shakeposition.set(0,this.shakevalue * this.shakeMagnifier, 0);
+            this.shakeposition.set(0,this.shakevalue * this.shakeMagnifier, othershakevalue * this.shakeMagnifier);
             this.modifiedposition.add2(this.baseposition, this.shakeposition);
             
             this.entity.setLocalPosition(this.modifiedposition);
