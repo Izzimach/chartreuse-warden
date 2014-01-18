@@ -20,12 +20,19 @@ pc.script.create('worldmap', function (context) {
                 var hexcoord = hex.hexcoord;
                 var hexX = hexsize * hexcoord[0] * Math.sqrt(3) / 2;
                 var hexZ = hexsize * (hexcoord[2] + hexcoord[0] * 0.5);
-                var hexpixelcoord = new pc.Vec3(hexX, basehex.getPosition().y, hexZ);
+                var hexpixelcoord = new pc.Vec3(hexX, basehex.getPosition().y + Math.random() * 0.02 - 0.01, hexZ);
 
                 var freshhex = basehex.clone();
-                entity.addChild(freshhex);
+                this.entity.addChild(freshhex);
                 freshhex.setPosition(hexpixelcoord);
-            });
+
+                // randomize rotation
+                var rotationangle = Math.floor(Math.random() * 6) * 60;
+                var newrotation = new pc.Quat();
+                newrotation.setFromEulerAngles(0,rotationangle,0);
+                freshhex.setLocalRotation(newrotation.mul(freshhex.getLocalRotation()));
+
+            }, this);
 
             basehex.destroy();
         },

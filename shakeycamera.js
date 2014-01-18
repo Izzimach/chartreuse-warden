@@ -29,7 +29,8 @@ pc.script.create('shakeycamera', function (context) {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.followtarget = this.entity.getRoot().findByName(this.followtargetname);
-            this.followoffset = new pc.Vec3(0,this.followdistance, this.followdistance);
+            this.followoffset = new pc.Vec3();
+            this.followoffset.sub2(this.entity.getPosition(), this.followtarget.getPosition()).normalize().scale(this.followdistance);
         },
 
         // Called every frame, dt is time in seconds since last update
@@ -57,6 +58,7 @@ pc.script.create('shakeycamera', function (context) {
             this.modifiedposition.add2(this.baseposition, this.shakeposition);
             
             this.entity.setLocalPosition(this.modifiedposition);
+            this.entity.lookAt(this.followtarget.getPosition());
         },
         
         addShake: function(shakeamplitude) {
