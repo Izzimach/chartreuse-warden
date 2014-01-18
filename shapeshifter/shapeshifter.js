@@ -79,7 +79,7 @@ pc.script.create('shapeshifter', function (context) {
                     this.particlescomponent.enable();
                     this.particlescomponent.restart();
                 }
-                this.camera.script.send('shakeycamera','addShake',1.0);
+                this.camera.script.send('shakeycamera','addShake',0.3);
             }
         }
         
