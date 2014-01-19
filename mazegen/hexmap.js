@@ -92,6 +92,29 @@ chartreusewarden.Hexmap.prototype = {
 		return [hex1coord, hex2coord];
 	},
 
+	parseEdgeCoordinateToWorldEndpoints: function(edgestring) {
+		var hexcoords = this.parseEdgeCoordinate(edgestring);
+		var hex1worldcoord = this.hexCoordToWorldCoord(hexcoords[0]);
+		var hex2worldcoord = this.hexCoordToWorldCoord(hexcoords[1]);
+		var midpoint = hex1worldcoord.clone().add(hex2worldcoord).scale(0.5);
+
+		// using geometry we know that the edge is perpendicular to the line between the two hex centers
+		// and scaled by 1/sqrt(3)
+		var edgebisector = hex2worldcoord.clone().sub(hex1worldcoord);
+
+		// here we rotate by 90 degrees
+		var edgevector = new pc.Vec3(-edgebisector.z, edgebisector.y, edgebisector.x).scale(1.0/Math.sqrt(3));
+
+		// we have the center of the edge and a vector representing the entire segment. now just
+		// halve the segment and use that to locate the endpoints
+		var halfedge = edgevector.clone().scale(0.5);
+
+		var endpoint1 = midpoint.clone().add(halfedge);
+		var endpoint2 = midpoint.clone().sub(halfedge);
+
+		return [endpoint1, endpoint2];
+	},
+
 	markDistanceFrom: function(starthex) {
 		// computes distance to from the start hex(es), following only hex connections
 

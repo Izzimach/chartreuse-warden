@@ -65,16 +65,18 @@ pc.script.create('worldmap', function (context) {
 
             // place a tree at each wall location
             _.each(wallplacements, function(walllocation) {
-                var hexcoords = hexmap.parseEdgeCoordinate(walllocation);
-                var hex1worldcoord = hexmap.hexCoordToWorldCoord(hexcoords[0]);
-                var hex2worldcoord = hexmap.hexCoordToWorldCoord(hexcoords[1]);
-                var walllocation = new pc.Vec3();
-                walllocation.add2(hex1worldcoord, hex2worldcoord);
-                walllocation.scale(0.5);
+                var edgeendpoints = hexmap.parseEdgeCoordinateToWorldEndpoints(walllocation);
+                var obstaclestep = edgeendpoints[1].clone().sub(edgeendpoints[0]).scale(0.33);
+                var walllocation1 = edgeendpoints[0].clone().add(obstaclestep);
+                var walllocation2 = walllocation1.clone().add(obstaclestep);
 
-                var freshwall = basetree.clone();
-                this.entity.addChild(freshwall);
-                freshwall.setPosition(walllocation);
+                var freshwall1 = basetree.clone();
+                this.entity.addChild(freshwall1);
+                freshwall1.setPosition(walllocation1);
+
+                var freshwall2 = basetree.clone();
+                this.entity.addChild(freshwall2);
+                freshwall2.setPosition(walllocation2);
             }, this);
             
             // clear out exemplar objects
