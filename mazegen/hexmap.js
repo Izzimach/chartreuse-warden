@@ -2,8 +2,9 @@ if (typeof chartreusewarden === 'undefined') {
 	chartreusewarden = {};
 }
 
-chartreusewarden.Hexmap = function() {
+chartreusewarden.Hexmap = function(hexspacing) {
 	this.mapdata = {}
+	this.hexspacing = hexspacing;
 
 	return this;
 };
@@ -48,15 +49,47 @@ chartreusewarden.Hexmap.prototype = {
 	},
 
 	newHexAt: function(hcoord, htype) {
-		var freshhex = {hexcoord: hcoord, hextype:htype, connectedhexes:[], distance:0};
+        var hexX = this.hexspacing * hcoord[0] * Math.sqrt(3) / 2;
+        var hexZ = this.hexspacing * (hcoord[2] + hcoord[0] * 0.5);
+        var hexworldcoord = new pc.Vec3(hexX, 0, hexZ);
+
+		var freshhex = {hexcoord: hcoord, worldcoord: hexworldcoord, hextype:htype, connectedhexes:[], distance:0};
 		this.setHex(hcoord, freshhex);
 
 		return freshhex;
 	},
 
+	hexCoordToWorldCoord: function(hexcoord) {
+        var hexX = this.hexspacing * hexcoord[0] * Math.sqrt(3) / 2;
+        var hexZ = this.hexspacing * (hexcoord[2] + hexcoord[0] * 0.5);
+        var hexworldcoord = new pc.Vec3(hexX, 0, hexZ);
+
+		return new pc.Vec3(hexX, 0, hexZ);		
+	},
+
 	connectHexes: function(hex1, hex2) {
 		hex1.connectedhexes.push(hex2);
 		hex2.connectedhexes.push(hex1);
+	},
+
+	buildEdgeCoordinate: function (hex1coord,hex2coord) {
+        // to define a specific edge, we specify the two hexes on either side of the edge
+        var hex1coordstring = this.coordToString(hex1coord);
+        var hex2coordstring = this.coordToString(hex2coord);
+
+        // use the coordinate that comes first lexigraphically, to avoid repeat edges
+        if (hex1coordstring < hex2coordstring) {
+            return hex1coordstring + ':' + hex2coordstring;
+        } else {
+            return hex2coordstring + ':' + hex1coordstring;
+        }
+   	},
+
+	parseEdgeCoordinate: function (edgestring) {
+		var hexstrings = edgestring.split(':');
+		var hex1coord = this.stringToCoord(hexstrings[0]);
+		var hex2coord = this.stringToCoord(hexstrings[1]);
+		return [hex1coord, hex2coord];
 	},
 
 	markDistanceFrom: function(starthex) {
