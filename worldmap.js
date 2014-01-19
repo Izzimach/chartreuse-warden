@@ -10,6 +10,10 @@ pc.script.create('worldmap', function (context) {
     WorldMap.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
+            this.needtobuild = true;
+        },
+
+        buildmap: function() {
             var basehex = this.entity.findByName("basichex");
             var basetree = this.entity.findByName("basictree");
 
@@ -34,6 +38,8 @@ pc.script.create('worldmap', function (context) {
                 var newrotation = new pc.Quat();
                 newrotation.setFromEulerAngles(0,rotationangle,0);
                 freshhex.setLocalRotation(newrotation.mul(freshhex.getLocalRotation()));
+
+                freshhex.rigidbody.syncEntityToBody();
 
             }, this);
 
@@ -73,10 +79,12 @@ pc.script.create('worldmap', function (context) {
                 var freshwall1 = basetree.clone();
                 this.entity.addChild(freshwall1);
                 freshwall1.setPosition(walllocation1);
+                freshwall1.rigidbody.syncEntityToBody();
 
                 var freshwall2 = basetree.clone();
                 this.entity.addChild(freshwall2);
                 freshwall2.setPosition(walllocation2);
+                freshwall2.rigidbody.syncEntityToBody();
             }, this);
             
             // clear out exemplar objects
@@ -86,6 +94,10 @@ pc.script.create('worldmap', function (context) {
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
+            if (this.needtobuild) {
+             this.buildmap();
+             this.needtobuild = false;
+            }
         }
         
     };
