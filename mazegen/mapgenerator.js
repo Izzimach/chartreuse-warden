@@ -23,12 +23,13 @@ chartreusewarden.generatemap = function(numhexes) {
 
 			// if no hex is here, add a hex and then we're done
 			if (curmap.getHex(curhexcoord) === undefined) {
-				var freshhex = {hexcoord:curhexcoord, hextype:"grass"};
-				curmap.setHex(curhexcoord, freshhex);
+				var newhex = curmap.newHexAt(curhexcoord, "gress");
+				curmap.connectHexes(somehex, newhex);
+
 				break;
 			}
 		}
 	}
 
 	return curmap;
-}
+};

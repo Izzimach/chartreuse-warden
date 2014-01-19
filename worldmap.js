@@ -20,11 +20,14 @@ pc.script.create('worldmap', function (context) {
                 var hexcoord = hex.hexcoord;
                 var hexX = hexsize * hexcoord[0] * Math.sqrt(3) / 2;
                 var hexZ = hexsize * (hexcoord[2] + hexcoord[0] * 0.5);
-                var hexpixelcoord = new pc.Vec3(hexX, basehex.getPosition().y + Math.random() * 0.02 - 0.01, hexZ);
+                var hexworldcoord = new pc.Vec3(hexX, basehex.getPosition().y + Math.random() * 0.02 - 0.01, hexZ);
+
+                // store world coordinate in the hex in case we need it later
+                hex.worldcoord = hexworldcoord;
 
                 var freshhex = basehex.clone();
                 this.entity.addChild(freshhex);
-                freshhex.setPosition(hexpixelcoord);
+                freshhex.setPosition(hexworldcoord);
 
                 // randomize rotation
                 var rotationangle = Math.floor(Math.random() * 6) * 60;

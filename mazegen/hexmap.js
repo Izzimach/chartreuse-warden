@@ -45,5 +45,34 @@ chartreusewarden.Hexmap.prototype = {
 
 	setHex: function(hexcoord, hexvalue) {
 		this.mapdata[this.coordToString(hexcoord)] = hexvalue;
+	},
+
+	newHexAt: function(hcoord, htype) {
+		var freshhex = {hexcoord: hcoord, hextype:htype, connectedhexes:[], distance:0};
+		this.setHex(hcoord, freshhex);
+
+		return freshhex;
+	},
+
+	connectHexes: function(hex1, hex2) {
+		hex1.connectedhexes.push(hex2);
+		hex2.connectedhexes.push(hex1);
+	},
+
+	markDistanceFrom: function(starthex) {
+		// computes distance to from the start hex(es), following only hex connections
+
+		// mark all hexes with a large distance value
+		var allhexes = _.values(this.mapdata);
+		_.each(allhexes, function(hex) {hex.distance = allhexes.length+1; });
+
+		if (typeof starthex.length === "undefined")
+		{
+ 			// passed in a single hex
+ 			starthex.distance = 0;
+		} else {
+			// passed in an array of hexes (hopefully)
+			_.each(starthex, function(hex) {hex.distance = 0;});
+		}
 	}
 }
