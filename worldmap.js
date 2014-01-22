@@ -90,13 +90,20 @@ pc.script.create('worldmap', function (context) {
             // clear out exemplar objects
             basehex.destroy();
             basetree.destroy();
+
+            // position the player at the start hex
+            var starthexes = hexmap.findHexesWithTag('start');
+            var starthex = starthexes[0];
+
+            var playerentity = this.entity.getRoot().findByName('Avatar');
+            playerentity.setPosition(starthex.worldcoord.x, starthex.worldcoord.y + 10, starthex.worldcoord.z);
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
             if (this.needtobuild) {
-             this.buildmap();
-             this.needtobuild = false;
+                this.buildmap();
+                this.needtobuild = false;
             }
         }
         
