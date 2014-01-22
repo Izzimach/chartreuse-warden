@@ -23,7 +23,7 @@ pc.script.create('shapeinstance', function (context) {
             this.disableShape();
 
             // the shapeshifter component should be in the parent node
-            this.animationthunk = this.entity.script.send('animationthunk','getComponentReference');
+            this.animationthunk = this.entity.script.instances['animationthunk'].instance;
             this.shapeshiftercomponent = this.entity.getParent().script.send('shapeshifter','addShape',this);
         },
 

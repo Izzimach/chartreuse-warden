@@ -31,7 +31,7 @@ chartreusewarden.generatemap = function(hexspacing, numhexes) {
 	// find the hex farthest away. Doing this twice in succession should produce a hex at or near the "end"
 	// of the map
 	function findfarthesthex (fromhex) {
-
+		
 	}
 
 	return curmap;

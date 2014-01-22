@@ -12,15 +12,15 @@ pc.script.create('shapeshifter', function (context) {
         this.shapes = {};
         this.activeshape = false;
         this.avatarmovementcomponent = null;
-        this.particlescomponent = null;
+        this.spellglitter = null;
         this.camera = null;
     };
 
     ShapeShifter.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
-            this.avatarmovementcomponent = this.entity.script.send('avatarmovement','getComponentReference');
-            this.particlescomponent = this.entity.script.send('torch','getComponentReference');
+            this.avatarmovementcomponent = this.entity.script.instances['avatarmovement'].instance;
+            this.spellglitter = this.entity.script.instances['spellglitter'].instance;
             this.camera = this.entity.getRoot().findByName('Camera');
             
             this.shapenames = JSON.parse(this.shapenamesJSON);
@@ -75,9 +75,11 @@ pc.script.create('shapeshifter', function (context) {
                 newshapecomponent.setActiveFlag(true);
 
                 this.avatarmovementcomponent.movespeed = this.activeshape.movespeed;
-                if (this.particlescomponent) {
-                    this.particlescomponent.enable();
-                    this.particlescomponent.restart();
+
+                // trigger a spell effect when we switch shapes
+                if (this.spellglitter) {
+                    this.spellglitter.enable();
+                    this.spellglitter.restart();
                 }
                 this.camera.script.send('shakeycamera','addShake',0.3);
             }
