@@ -16,12 +16,12 @@ pc.script.create("avatarmovement", function (context) {
 
         move: function(movetarget) {
             this.moveerror.sub2(movetarget, this.entity.rigidbody.linearVelocity);
-            this.moveerror.scale(0.001);
-            //this.entity.rigidbody.applyForce(0,0,0);
-            var newvel = new pc.Vec3(1,0,0);
+            this.moveerror.scale(10);
             this.entity.rigidbody.activate();
-            this.entity.rigidbody.linearVelocity = movetarget;
-            //this.entity.rigidbody.applyForce(10,0,0);
+            this.entity.rigidbody.applyForce(this.moveerror.x, 0, this.moveerror.z);
+            /*var newvel = new pc.Vec3(1,0,0);
+            this.entity.rigidbody.activate();
+            this.entity.rigidbody.linearVelocity = movetarget;*/
         },
  
         update: function (dt) {

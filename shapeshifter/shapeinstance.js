@@ -12,12 +12,15 @@ pc.script.create('shapeinstance', function (context) {
         this.animationthunk = null;
         this.shapename = "";
         this.isactive = false;
+        this.attributes = [];
     };
 
     ShapeInstance.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.shapename = this.entity.getName();
+
+            if (this.shapename == "BearShape") { this.attributes.push('strong');}
 
             // should start off disabled
             this.disableShape();
