@@ -6,7 +6,7 @@ chartreusewarden.generatemap = function(hexspacing, numhexes) {
 
 	var curmap = new chartreusewarden.Hexmap(hexspacing);
 
-	var starthex = curmap.newHexAt([0,0,0]);
+	var centerhex = curmap.newHexAt([0,0,0]);
 
 	// randomly pick a hex and add in one adjacent to it
 	for (var ix=0; ix < 5; ix++) {
@@ -31,8 +31,25 @@ chartreusewarden.generatemap = function(hexspacing, numhexes) {
 	// find the hex farthest away. Doing this twice in succession should produce a hex at or near the "end"
 	// of the map
 	function findfarthesthex (fromhex) {
-		
+		curmap.markDistanceFrom(fromhex);
+
+		var farthesthex = _.chain(curmap.mapdata)
+				.values()
+				.max(function(x) { return x.distance; })
+				.value();
+
+		return farthesthex;
 	}
+
+	var starthex = centerhex;
+	starthex = findfarthesthex(starthex);
+	starthex = findfarthesthex(starthex);
+
+	starthex.tags.push('start');
+
+	var endhex = findfarthesthex(starthex);
+	endhex.tags.push('end');
+
 
 	return curmap;
 };

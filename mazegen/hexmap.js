@@ -53,7 +53,7 @@ chartreusewarden.Hexmap.prototype = {
         var hexZ = this.hexspacing * (hcoord[2] + hcoord[0] * 0.5);
         var hexworldcoord = new pc.Vec3(hexX, 0, hexZ);
 
-		var freshhex = {hexcoord: hcoord, worldcoord: hexworldcoord, hextype:htype, connectedhexes:[], distance:0};
+		var freshhex = {hexcoord: hcoord, worldcoord: hexworldcoord, hextype:htype, connectedhexes:[], tags:[], distance:0};
 		this.setHex(hcoord, freshhex);
 
 		return freshhex;
@@ -115,6 +115,13 @@ chartreusewarden.Hexmap.prototype = {
 		return [endpoint1, endpoint2];
 	},
 
+	findHexesWithTag: function(searchtag) {
+		return _.chain(this.mapdata)
+			.values()
+			.filter(function(x) {return _.contains(x.tags, searchtag);})
+			.value();
+	},
+
 	markDistanceFrom: function(starthex) {
 		// computes distance to from the start hex(es), following only hex connections
 
@@ -127,8 +134,26 @@ chartreusewarden.Hexmap.prototype = {
  			// passed in a single hex
  			starthex.distance = 0;
 		} else {
-			// passed in an array of hexes (hopefully)
+			// passed in an array of hexes (hopefully!)
 			_.each(starthex, function(hex) {hex.distance = 0;});
+		}
+
+		// now iterate. for each hex, see if any adjacent hexes are closer to the start than this hex.
+		// (that is, some adjacent hex has a stored distance value smaller than the distance stored in this hex)
+		// if they are, we should adjust the distance of this hex to be one greater than the distance of
+		// the closer adjacent hex
+		var shoulditerate = true;
+		while (shoulditerate) {
+			shoulditerate = false;
+
+			_.each(allhexes, function (hex) {
+				// check adjacent hexes. are any closer than this hex?
+				var closestadjacent = _.min(hex.connectedhexes, function(hex) { return hex.distance; });
+				if (closestadjacent.distance + 1 < hex.distance) {
+					hex.distance = closestadjacent.distance + 1;
+					shoulditerate = true; // proper values haven't propagated to all hexes yet
+				}
+			});
 		}
 	}
 }
