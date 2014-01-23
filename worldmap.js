@@ -14,10 +14,13 @@ pc.script.create('worldmap', function (context) {
         },
 
         buildmap: function() {
-            var basehex = this.entity.findByName("basichex");
-            var basetree = this.entity.findByName("basictree");
+            var basehex = this.entity.findByName('basichex');
+            var basetree = this.entity.findByName('basictree');
+            var marker1 = this.entity.findByName('marker1');
+            var marker2 = this.entity.findByName('marker2');
 
             var hexmap = chartreusewarden.generatemap(hexsize, numhexes);
+            chartreusewarden.generateobstacles(hexmap);
 
             var hexes = _.values(hexmap.mapdata);
             var entity = this.entity;
@@ -41,6 +44,24 @@ pc.script.create('worldmap', function (context) {
 
                 freshhex.rigidbody.syncEntityToBody();
 
+            }, this);
+
+            // place notations for the hexes (used for debugging)
+            _.each(hexes, function(hex) {
+                var markercoord = hex.worldcoord.clone();
+                markercoord.y += 10;
+
+                // mark spot with a region tag of some sort
+                if (_.some(hex.tags, function(tag) {return tag.indexOf('preobs') === 0;})) {
+                    var freshmarker = marker1.clone();
+                    this.entity.addChild(freshmarker);
+                    freshmarker.setPosition(markercoord);
+                }
+                if (_.some(hex.tags, function(tag) {return tag.indexOf('postobs') === 0;})) {
+                    var freshmarker = marker2.clone();
+                    this.entity.addChild(freshmarker);
+                    freshmarker.setPosition(markercoord);
+                }
             }, this);
 
             // some hexes are adjacent but not "connected" so we have to place to wall

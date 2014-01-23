@@ -1,6 +1,6 @@
 if (typeof chartreusewarden === 'undefined') {
-	chartreusewarden = {};
-}
+	var chartreusewarden = {};
+};
 
 chartreusewarden.generatemap = function(hexspacing, numhexes) {
 

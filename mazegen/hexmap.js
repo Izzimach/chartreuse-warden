@@ -1,6 +1,6 @@
 if (typeof chartreusewarden === 'undefined') {
-	chartreusewarden = {};
-}
+	var chartreusewarden = {};
+};
 
 chartreusewarden.Hexmap = function(hexspacing) {
 	this.mapdata = {}
@@ -116,9 +116,24 @@ chartreusewarden.Hexmap.prototype = {
 	},
 
 	findHexesWithTag: function(searchtag) {
-		return _.chain(this.mapdata)
+		// single search term
+		if (typeof searchtag == 'string') {
+			return _.chain(this.mapdata)
+				.values()
+				.filter(function(x) { return _.contains(x.tags, searchtag);})
+				.value();
+		}
+
+		// array of term, then? only return hexes that match all the terms
+		var matchesalltags = function(x) {
+			return _.every(searchtag, 
+				function(tag) { return _.contains(x.tags,tag);}
+			)
+		};
+
+		var hexes = _.chain(this.mapdata)
 			.values()
-			.filter(function(x) {return _.contains(x.tags, searchtag);})
+			.filter(matchesalltags)
 			.value();
 	},
 

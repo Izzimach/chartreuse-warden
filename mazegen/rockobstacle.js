@@ -32,6 +32,8 @@ pc.script.create("rockobstacle", function (context) {
                 return;
             }
 
+            // if the shapeshifter is in a shape that has the 'strong' attribute, the rock moves, otherwise
+            // it stays still
             var shapeshifter = otherentity.script.instances['shapeshifter'];
             if (typeof shapeshifter !== 'undefined') {
                 var currentshapeattributes = shapeshifter.instance.activeshape.attributes;
