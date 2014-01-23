@@ -118,10 +118,10 @@ chartreusewarden.Hexmap.prototype = {
 	findHexesWithTag: function(searchtag) {
 		// single search term
 		if (typeof searchtag == 'string') {
-			return _.chain(this.mapdata)
+			return _(this.mapdata)
 				.values()
 				.filter(function(x) { return _.contains(x.tags, searchtag);})
-				.value();
+				.valueOf();
 		}
 
 		// array of term, then? only return hexes that match all the terms
