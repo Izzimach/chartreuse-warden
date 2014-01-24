@@ -3,8 +3,9 @@ if (typeof chartreusewarden === 'undefined') {
 };
 
 chartreusewarden.generatemap = function(hexspacing, numhexes) {
+	var Hexmap = chartreusewarden.Hexmap;
 
-	var curmap = new chartreusewarden.Hexmap(hexspacing);
+	var curmap = new Hexmap(hexspacing);
 
 	var centerhex = curmap.newHexAt([0,0,0]);
 
@@ -12,7 +13,7 @@ chartreusewarden.generatemap = function(hexspacing, numhexes) {
 	for (var ix=0; ix < 5; ix++) {
 		var somehex = curmap.randomHex();
 
-		var adjhexes = _.shuffle(curmap.getAdjacentHexes(somehex.hexcoord));
+		var adjhexes = _.shuffle(Hexmap.getAdjacentHexCoordinates(somehex.hexcoord));
 
 		for (var testix=0; testix < 6; testix++) {
 			var curhexcoord = adjhexes[testix];
@@ -20,7 +21,7 @@ chartreusewarden.generatemap = function(hexspacing, numhexes) {
 			// if no hex is here, add a hex and then we're done
 			if (curmap.getHex(curhexcoord) === undefined) {
 				var newhex = curmap.newHexAt(curhexcoord, "grass");
-				curmap.connectHexes(somehex, newhex);
+				Hexmap.connectHexes(somehex, newhex);
 
 				break;
 			}

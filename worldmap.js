@@ -2,6 +2,7 @@
 pc.script.create('worldmap', function (context) {
     var hexsize = 34;
     var numhexes = 5;
+    var Hexmaplib = chartreusewarden.Hexmap;
 
     var WorldMap = function (entity) {
         this.entity = entity;
@@ -20,10 +21,10 @@ pc.script.create('worldmap', function (context) {
             var marker1 = this.entity.findByName('marker1');
             var marker2 = this.entity.findByName('marker2');
 
-            var hexmap = chartreusewarden.generatemap(hexsize, numhexes);
-            var obstacledata = chartreusewarden.generateobstacles(hexmap);
+            var worldhexes = chartreusewarden.generatemap(hexsize, numhexes);
+            var obstacledata = chartreusewarden.generateobstacles(worldhexes);
 
-            var hexes = _.values(hexmap.mapdata);
+            var hexes = _.values(worldhexes.mapdata);
             var entity = this.entity;
 
             // place hexes
@@ -50,7 +51,7 @@ pc.script.create('worldmap', function (context) {
             // place notations for the hexes (used for debugging)
             _.forEach(hexes, function(hex) {
                 var markercoord = hex.worldcoord.clone();
-                markercoord.y += 10;
+                markercoord.y += 1;
 
                 // mark spot with a region tag of some sort
                 if (_.some(hex.tags, function(tag) {return tag === 'reachable';})) {
@@ -65,17 +66,17 @@ pc.script.create('worldmap', function (context) {
             var wallplacements = [];
             _.forEach(hexes, function(hex) {
                 var hexcoord = hex.hexcoord;
-                var adjhexcoords = hexmap.getAdjacentHexes(hexcoord);
+                var adjhexcoords = Hexmaplib.getAdjacentHexCoordinates(hexcoord);
 
                 // if an adjacent hex doesn't exist, we need a wall
                 // if an adjacent hex exists but isn't connected to this hex we need a wall
                 // if an adjacent hex exists and is connected we don't need a wall
                 _.forEach(adjhexcoords, function(adjhexcoord) {
-                    var adjhex = hexmap.getHex(adjhexcoord);
+                    var adjhex = worldhexes.getHex(adjhexcoord);
                     var needwall =  ((typeof adjhex === "undefined") || (_.contains(hex.connectedhexes, adjhex) === false));
 
                     if (needwall) {
-                        var edgestring = hexmap.buildEdgeCoordinate(hexcoord, adjhexcoord);
+                        var edgestring = Hexmaplib.buildEdgeCoordinate(hexcoord, adjhexcoord);
 
                         // add to the list of walls if it isn't already there
                         if (_.contains(wallplacements, edgestring) === false) {
@@ -88,7 +89,7 @@ pc.script.create('worldmap', function (context) {
 
             // place a tree at each wall location
             _.forEach(wallplacements, function(walllocation) {
-                var edgeendpoints = hexmap.parseEdgeCoordinateToWorldEndpoints(walllocation);
+                var edgeendpoints = worldhexes.convertEdgeCoordinatesToWorldEndpoints(walllocation);
                 var obstaclestep = edgeendpoints[1].clone().sub(edgeendpoints[0]).scale(0.33);
                 var walllocation1 = edgeendpoints[0].clone().add(obstaclestep);
                 var walllocation2 = walllocation1.clone().add(obstaclestep);
@@ -108,9 +109,9 @@ pc.script.create('worldmap', function (context) {
             _.forEach(obstacledata.obstacles, function(obstacle) {
                 var hex1coord = obstacle.hex1.hexcoord;
                 var hex2coord = obstacle.hex2.hexcoord;
-                var obstaclesegment = hexmap.parseEdgeCoordinateToWorldEndpoints([hex1coord, hex2coord]);
+                var obstaclesegment = worldhexes.convertEdgeCoordinatesToWorldEndpoints([hex1coord, hex2coord]);
                 var midpoint = obstaclesegment[0].clone().add(obstaclesegment[1]).scale(0.5);
-                midpoint.y += 5;
+                midpoint.y += 2;
 
                 var freshobstacle = baserock.clone();
                 this.entity.addChild(freshobstacle);
@@ -125,7 +126,7 @@ pc.script.create('worldmap', function (context) {
             exemplarcontainer.destroy();
 
             // position the player at the start hex
-            var starthexes = hexmap.findHexesWithTag('start');
+            var starthexes = worldhexes.findHexesWithTag('start');
             var starthex = starthexes[0];
 
             var playerentity = this.entity.getRoot().findByName('Avatar');

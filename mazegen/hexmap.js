@@ -9,8 +9,26 @@ chartreusewarden.Hexmap = function(hexspacing) {
 	return this;
 };
 
-chartreusewarden.Hexmap.prototype = {
-	getAdjacentHexes: function(curhexcoord) {
+//
+// non-instance methods of Hexmap
+//
+
+pc.extend(chartreusewarden.Hexmap, {
+	coordToString: function(hexcoord) {
+		return hexcoord[0].toString() + ',' + hexcoord[1].toString() + ',' + hexcoord[2];
+	},
+
+	stringToCoord: function(coordstring) {
+		var bits = coordstring.split(',');
+		return [parseInt(bits[0]), parseInt(bits[1]), parseInt(bits[2])];
+	},
+
+	connectHexes: function(hex1, hex2) {
+		hex1.connectedhexes.push(hex2);
+		hex2.connectedhexes.push(hex1);
+	},
+
+	getAdjacentHexCoordinates: function(curhexcoord) {
 		var hexX = curhexcoord[0];
 		var hexY = curhexcoord[1];
 		var hexZ = curhexcoord[2];
@@ -25,27 +43,45 @@ chartreusewarden.Hexmap.prototype = {
 		return [hex1,hex2,hex3,hex4,hex5,hex6];
 	},
 
+	buildEdgeCoordinate: function (hex1coord,hex2coord) {
+        // to define a specific edge, we specify the two hexes on either side of the edge
+        var hex1coordstring = chartreusewarden.Hexmap.coordToString(hex1coord);
+        var hex2coordstring = chartreusewarden.Hexmap.coordToString(hex2coord);
+
+        // use the coordinate that comes first lexigraphically, to avoid repeat edges
+        if (hex1coordstring < hex2coordstring) {
+            return hex1coordstring + ':' + hex2coordstring;
+        } else {
+            return hex2coordstring + ':' + hex1coordstring;
+        }
+   	},
+
+	parseEdgeCoordinate: function (edgestring) {
+		var hexstrings = edgestring.split(':');
+		var hex1coord = chartreusewarden.Hexmap.stringToCoord(hexstrings[0]);
+		var hex2coord = chartreusewarden.Hexmap.stringToCoord(hexstrings[1]);
+		return [hex1coord, hex2coord];
+	},
+
+});
+
+//
+// Hexmap instance methods
+//
+
+chartreusewarden.Hexmap.prototype = {
+
 	randomHex: function() {
 		return _.sample(_.values(this.mapdata));
 	},
 
-	// javascript objects hash on strings only. dammit
-
-	coordToString: function(hexcoord) {
-		return hexcoord[0].toString() + ',' + hexcoord[1].toString() + ',' + hexcoord[2];
-	},
-
-	stringToCoord: function(coordstring) {
-		var bits = coordstring.split(',');
-		return [parseInt(bits[0]), parseInt(bits[1]), parseInt(bits[2])];
-	},
 
 	getHex: function(hexcoord) {
-		return this.mapdata[this.coordToString(hexcoord)];
+		return this.mapdata[chartreusewarden.Hexmap.coordToString(hexcoord)];
 	},
 
 	setHex: function(hexcoord, hexvalue) {
-		this.mapdata[this.coordToString(hexcoord)] = hexvalue;
+		this.mapdata[chartreusewarden.Hexmap.coordToString(hexcoord)] = hexvalue;
 	},
 
 	newHexAt: function(hcoord, htype) {
@@ -67,36 +103,11 @@ chartreusewarden.Hexmap.prototype = {
 		return new pc.Vec3(hexX, 0, hexZ);		
 	},
 
-	connectHexes: function(hex1, hex2) {
-		hex1.connectedhexes.push(hex2);
-		hex2.connectedhexes.push(hex1);
-	},
-
-	buildEdgeCoordinate: function (hex1coord,hex2coord) {
-        // to define a specific edge, we specify the two hexes on either side of the edge
-        var hex1coordstring = this.coordToString(hex1coord);
-        var hex2coordstring = this.coordToString(hex2coord);
-
-        // use the coordinate that comes first lexigraphically, to avoid repeat edges
-        if (hex1coordstring < hex2coordstring) {
-            return hex1coordstring + ':' + hex2coordstring;
-        } else {
-            return hex2coordstring + ':' + hex1coordstring;
-        }
-   	},
-
-	parseEdgeCoordinate: function (edgestring) {
-		var hexstrings = edgestring.split(':');
-		var hex1coord = this.stringToCoord(hexstrings[0]);
-		var hex2coord = this.stringToCoord(hexstrings[1]);
-		return [hex1coord, hex2coord];
-	},
-
-	parseEdgeCoordinateToWorldEndpoints: function(coordinates) {
+	convertEdgeCoordinatesToWorldEndpoints: function(coordinates) {
 		var hexcoords = coordinates;
 		if (typeof coordinates === 'string') {
 			// parse out coordinates from string
-			hexcoords = this.parseEdgeCoordinate(coordinates);
+			hexcoords = chartreusewarden.Hexmap.parseEdgeCoordinate(coordinates);
 		}
 		var hex1worldcoord = this.hexCoordToWorldCoord(hexcoords[0]);
 		var hex2worldcoord = this.hexCoordToWorldCoord(hexcoords[1]);
