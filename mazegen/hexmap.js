@@ -92,8 +92,12 @@ chartreusewarden.Hexmap.prototype = {
 		return [hex1coord, hex2coord];
 	},
 
-	parseEdgeCoordinateToWorldEndpoints: function(edgestring) {
-		var hexcoords = this.parseEdgeCoordinate(edgestring);
+	parseEdgeCoordinateToWorldEndpoints: function(coordinates) {
+		var hexcoords = coordinates;
+		if (typeof coordinates === 'string') {
+			// parse out coordinates from string
+			hexcoords = this.parseEdgeCoordinate(coordinates);
+		}
 		var hex1worldcoord = this.hexCoordToWorldCoord(hexcoords[0]);
 		var hex2worldcoord = this.hexCoordToWorldCoord(hexcoords[1]);
 		var midpoint = hex1worldcoord.clone().add(hex2worldcoord).scale(0.5);
@@ -116,25 +120,18 @@ chartreusewarden.Hexmap.prototype = {
 	},
 
 	findHexesWithTag: function(searchtag) {
+		var hexmatches = null;
+
 		// single search term
 		if (typeof searchtag == 'string') {
-			return _(this.mapdata)
-				.values()
-				.filter(function(x) { return _.contains(x.tags, searchtag);})
-				.valueOf();
+			hexmatches = function(x) { return _.contains(x.tags, searchtag);};
+		} else {
+			hexmatches = function(x) {
+				return _.every(searchtag, function(tag) { return _.contains(x.tags,tag);});
+			}
 		}
 
-		// array of term, then? only return hexes that match all the terms
-		var matchesalltags = function(x) {
-			return _.every(searchtag, 
-				function(tag) { return _.contains(x.tags,tag);}
-			)
-		};
-
-		var hexes = _.chain(this.mapdata)
-			.values()
-			.filter(matchesalltags)
-			.value();
+		return _(this.mapdata).values().filter(hexmatches).valueOf();
 	},
 
 	markDistanceFrom: function(starthex) {

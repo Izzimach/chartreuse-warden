@@ -6,7 +6,7 @@ chartreusewarden.generateobstacles = (function() {
 	// add the given tag to this hex an all adjacent hexes. You can specify a function to restrict
 	// the fill algorithm. Make your function take a given hex and return false if that hex is not to be
 	// filled.
-	function floodfill(hex, name, dontfillhex) {
+	function floodFillTag(hex, name, dontfillhex) {
 		if (dontfillhex(hex)) return;
 
 		if (_.contains(hex.tags, name)) {
@@ -14,38 +14,46 @@ chartreusewarden.generateobstacles = (function() {
 		}
 		hex.tags.push(name);
 		_.each(hex.connectedhexes, function (adjhex) {
-			floodfill(adjhex, name, dontfillhex);
+			floodFillTag(adjhex, name, dontfillhex);
 		})
 	}
 
-	// given a hex map and an edge (defined by two adjacent hexes) this function
-	// divides the map into two regions, one region on each side of the edge.
-	// The hexes in each region are all given a certain tag (or no tag if you don't pass in anything)
-	function partitionAtEdge(hexmap, hex1, hex2, hex1regionname, hex2regionname) {
-		// just flood fill from hex1, without going into hex2
-		if (typeof hex1regionname !== 'undefined') {
-			floodfill(hex1, hex1regionname, function(hex) {return hex === hex2;});
-		}
+	function buildObstacle(hex1,hex2,obstaclename) {
+		return { hex1:hex1, hex2:hex2, name:name, type:""};
+	}
 
-		if (typeof hex2regionname !== 'undefined') {
-			floodfill(hex2, hex2regionname, function(hex) { return hex === hex1;});
-		}
-	};
+	// returns true if going from hex1 to hex2 crosses the indicated obstacle
+	function crossesObstacle(hex1, hex2, obstacle) {
+		return (hex1 === obstacle.hex1 && hex2 === obstacle.hex2) ||
+			(hex2 === obstacle.hex1 && hex1 === obstacle.hex2);
+	}
 
-	function getTagsWithPrefix(somehex, prefix) {
-		// filter out all tags without the given prefix
-		return _.filter(somehex.tags, function(tag) { return x.indexOf(prefix) === 0; });
-	};
+	// given a start hex, finds all hexes accessible without crossing the provided obstacles
+	function findReachableHexes(starthex, obstacles) {
+		pc.log.write("obstacle at " + obstacles[0].hex1.hexcoord.toString() + "-" + obstacles[0].hex2.hexcoord.toString());
+		var isBlocked = function(hex1,hex2) { 
+			var obstaclehere = _.some(obstacles, function(obs) {return crossesObstacle(hex1,hex2,obs);});
+			pc.log.write("isblocked? " + hex1.hexcoord.toString() + "-" + hex2.hexcoord.toString() + ":" + obstaclehere.toString());
+			return obstaclehere;
+		};
 
-	// gets all region tags in the hex (they all start with some known prefix) and
-	// merges them into a big string. Region tags are lexigraphically sorted before
-	// merged, so all hexes that have the same set of region tags should get the
-	// same merged result
-	function buildRegionID(somehex, regionprefix) {
-		var regiontags = getTagsWithPrefix(somehex, regionprefix);
-		var sortedtags = _.sortBy(regiontags, function(x) {return x;});
-		return sortedtags.join(':');
-	};
+		var reachablehexes = [starthex];
+
+		return findReachableHexes_recur(starthex, isBlocked, reachablehexes);
+	}
+
+	function findReachableHexes_recur(hex, isBlockedFunc, reachablessofar) {
+		// check all adjacent hexes. If any are not blocked and not already
+		// found as reachable, add them and recurse
+		_.each(hex.connectedhexes, function(adjhex) {
+			if (!_.contains(reachablessofar, adjhex) && !isBlockedFunc(hex,adjhex)) {
+				reachablessofar.push(adjhex);
+				findReachableHexes_recur(adjhex, isBlockedFunc, reachablessofar);
+			}
+		});
+
+		return reachablessofar;
+	}
 
 	var generator = function(hexmap) {
 		var starthexes = hexmap.findHexesWithTag('start');
@@ -59,7 +67,13 @@ chartreusewarden.generateobstacles = (function() {
 		// pick some adjacent hex at random
 		var obstacleendhex = _.sample(obstaclestarthex.connectedhexes);
 
-		partitionAtEdge(hexmap, obstaclestarthex, obstacleendhex, 'preobstacle','postobstacle');
+		var obstacle = buildObstacle(obstaclestarthex, obstacleendhex, 'testobstacle');
+		var obstaclelist = [obstacle];
+
+		var reachablehexes = findReachableHexes(starthexes[0], obstaclelist);
+		_.each(reachablehexes, function(hex) {hex.tags.push('reachable');});
+
+		return { obstacles: obstaclelist};
 	}
 
 	return generator;
