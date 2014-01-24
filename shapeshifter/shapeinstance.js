@@ -10,6 +10,11 @@ pc.script.create('shapeinstance', function (context) {
         this.entity = entity;
         this.shapeshiftercomponent = null;
         this.animationthunk = null;
+
+        this.usingattribute = false;
+        this.usingattributename = "";
+        this.usingattributetimeleft = 0;
+
         this.shapename = "";
         this.isactive = false;
         this.attributes = [];
@@ -34,14 +39,30 @@ pc.script.create('shapeinstance', function (context) {
         update: function (dt) {
             if (!this.isactive) { return; }
 
-            // switch between running and idle animations as appropriate
-            if (this.shapeshiftercomponent.avatarmovementcomponent) {
-                if (this.shapeshiftercomponent.avatarmovementcomponent.ismoving) {
-                    this.animationthunk.setDefaultAnimation('run');
-                } else {
-                    this.animationthunk.setDefaultAnimation('idle');
+            // is an attribute active? if so, we need to modify the animation
+            if (this.usingattribute) {
+                this.usingattributetimeleft -= dt;
+                this.usingattribute = (this.usingattributetimeleft > 0);
+
+
+            } else {
+                // no active attribute
+                // switch between running and idle animations as appropriate
+                if (this.shapeshiftercomponent.avatarmovementcomponent) {
+                    if (this.shapeshiftercomponent.avatarmovementcomponent.ismoving) {
+                        this.animationthunk.setDefaultAnimation('run');
+                    } else {
+                        this.animationthunk.setDefaultAnimation('idle');
+                    }
                 }
             }
+
+        },
+
+        usingAttribute: function(attributename) {
+            this.usingattributetimeleft = 0.2;
+            this.usingattributename = attributename;
+            this.usingattribute = true;
         },
 
         setActiveFlag: function(activeflag) {

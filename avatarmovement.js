@@ -4,6 +4,7 @@ pc.script.create("avatarmovement", function (context) {
         this.entity = entity;
         this.movespeed = 1;
         this.ismoving = false;
+        this.movementenabled = false;
     };
  
     AvatarMovement.prototype = {
@@ -12,6 +13,7 @@ pc.script.create("avatarmovement", function (context) {
             //this.entity.rigidbody.angularFactor = 0;
             this.movetargetvelocity = new pc.Vec3();
             this.moveerror = new pc.Vec3();
+            this.movementenabled = true;
         },
 
         move: function(movetarget) {
@@ -25,6 +27,8 @@ pc.script.create("avatarmovement", function (context) {
         },
  
         update: function (dt) {
+            if (!this.movementenabled) { return; }
+            
             var dx = 0;
             var dy = 0;
             var jump = false;
