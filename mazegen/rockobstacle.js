@@ -15,6 +15,8 @@ pc.script.create("rockobstacle", function (context) {
         },
 
         update: function (dt) {
+            if (this.entity.getParent() === null) { return; } // just got destroyed
+
             if (this.enabled) {
                 this.rigidbody.type = pc.fw.RIGIDBODY_TYPE_DYNAMIC;
 
