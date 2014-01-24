@@ -2,10 +2,21 @@ if (typeof chartreusewarden === 'undefined') {
 	var chartreusewarden = {};
 };
 
+//
+// places obstacles (doors) along with keys to open the doors
+// a lot of the code here is to figure out:
+// 1. where the place the doors
+// 2. where to place keys so that all the doors can be opened
+//
+
 chartreusewarden.generateobstacles = (function() {
+	
+	//
 	// add the given tag to this hex an all adjacent hexes. You can specify a function to restrict
 	// the fill algorithm. Make your function take a given hex and return false if that hex is not to be
 	// filled.
+	//
+
 	function floodFillTag(hex, name, dontfillhex) {
 		if (dontfillhex(hex)) return;
 
@@ -16,17 +27,17 @@ chartreusewarden.generateobstacles = (function() {
 		_.each(hex.connectedhexes, function (adjhex) {
 			floodFillTag(adjhex, name, dontfillhex);
 		})
-	}
+	};
 
 	function buildObstacle(hex1,hex2,obstaclename) {
 		return { hex1:hex1, hex2:hex2, name:name, type:""};
-	}
+	};
 
 	// returns true if going from hex1 to hex2 crosses the indicated obstacle
 	function crossesObstacle(hex1, hex2, obstacle) {
 		return (hex1 === obstacle.hex1 && hex2 === obstacle.hex2) ||
 			(hex2 === obstacle.hex1 && hex1 === obstacle.hex2);
-	}
+	};
 
 	// given a start hex, finds all hexes accessible without crossing the provided obstacles
 	function findReachableHexes(starthex, obstacles) {
@@ -40,9 +51,11 @@ chartreusewarden.generateobstacles = (function() {
 		var reachablehexes = [starthex];
 
 		return findReachableHexes_recur(starthex, isBlocked, reachablehexes);
-	}
+	};
 
 	function findReachableHexes_recur(hex, isBlockedFunc, reachablessofar) {
+		pc.log.write('at hex ' + hex.hexcoord.toString());
+
 		// check all adjacent hexes. If any are not blocked and not already
 		// found as reachable, add them and recurse
 		_.each(hex.connectedhexes, function(adjhex) {
@@ -53,7 +66,7 @@ chartreusewarden.generateobstacles = (function() {
 		});
 
 		return reachablessofar;
-	}
+	};
 
 	var generator = function(hexmap) {
 		var starthexes = hexmap.findHexesWithTag('start');
