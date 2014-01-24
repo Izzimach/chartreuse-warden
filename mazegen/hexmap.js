@@ -61,7 +61,7 @@ pc.extend(chartreusewarden.Hexmap, {
 		var hex1coord = chartreusewarden.Hexmap.stringToCoord(hexstrings[0]);
 		var hex2coord = chartreusewarden.Hexmap.stringToCoord(hexstrings[1]);
 		return [hex1coord, hex2coord];
-	},
+	}
 
 });
 
@@ -74,7 +74,6 @@ chartreusewarden.Hexmap.prototype = {
 	randomHex: function() {
 		return _.sample(_.values(this.mapdata));
 	},
-
 
 	getHex: function(hexcoord) {
 		return this.mapdata[chartreusewarden.Hexmap.coordToString(hexcoord)];

@@ -12,6 +12,10 @@ pc.script.create("rockobstacle", function (context) {
             var obstacle = this;
             this.rigidbody = this.entity.rigidbody;
             this.entity.collision.on('contact', function(contactinfo) { obstacle.pushed(contactinfo.other); });
+
+            // roll around for a few seconds to stabilize
+            this.enabledtimeleft = 2.0;
+            this.enabled = true;
         },
 
         update: function (dt) {
