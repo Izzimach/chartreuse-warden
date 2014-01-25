@@ -3,7 +3,7 @@
 // Handles the data and animation of a specific shape available to the shapeshifter.
 //
 pc.script.attribute('movespeed','number',1);
-pc.script.attribute('attributesJSON','string','[]'');
+pc.script.attribute('attributesJSON','string','[]');
 
 pc.script.create('shapeinstance', function (context) {
     // Creates a new Shakeycamera instance
