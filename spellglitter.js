@@ -80,3 +80,4 @@ pc.script.create('spellglitter', function (context) {
 
    return SpellGlitter;
 });
+

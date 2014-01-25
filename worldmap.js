@@ -164,3 +164,4 @@ pc.script.create('worldmap', function (context) {
 
     return WorldMap;
 });
+

@@ -55,6 +55,7 @@ pc.script.create("avatarmovement", function (context) {
                 jump = true;
             }
 
+            this.movetargetvelocity.set(dx*this.movespeed, 0, dy*this.movespeed);
             this.move(this.movetargetvelocity);
 
             // update facing based on movement direction
