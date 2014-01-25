@@ -11,10 +11,6 @@ pc.script.create('shapeinstance', function (context) {
         this.shapeshiftercomponent = null;
         this.animationthunk = null;
 
-        this.usingattribute = false;
-        this.usingattributename = "";
-        this.usingattributetimeleft = 0;
-
         this.shapename = "";
         this.isactive = false;
         this.attributes = [];
@@ -25,44 +21,49 @@ pc.script.create('shapeinstance', function (context) {
         initialize: function () {
             this.shapename = this.entity.getName();
 
-            if (this.shapename == "BearShape") { this.attributes.push('strong');}
+            if (this.shapename == "BearShape") { this.attributes.push('strong'); }
 
             // should start off disabled
             this.disableShape();
 
             // the shapeshifter component should be in the parent node
-            this.animationthunk = this.entity.script.instances['animationthunk'].instance;
-            this.shapeshiftercomponent = this.entity.getParent().script.send('shapeshifter','addShape',this);
+            this.animationthunk = this.entity.script.animationthunk;
+            this.shapeshiftercomponent = this.entity.getParent().script.shapeshifter;
+            this.shapeshiftercomponent.addShape(this);
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
             if (!this.isactive) { return; }
 
-            // is an attribute active? if so, we need to modify the animation
-            if (this.usingattribute) {
-                this.usingattributetimeleft -= dt;
-                this.usingattribute = (this.usingattributetimeleft > 0);
+            var mover = this.shapeshiftercomponent.avatarmovementcomponent;
+            var animator = this.animationthunk;
 
+            // use certain available attributes
+            if (this.shapeshiftercomponent.isAttributeAvailable('strong') &&
+                _.contains(this.attributes, 'strong')) {
+                this.shapeshiftercomponent.useAttribute('strong');
+            }
 
+            // is an attribute active? if so, we may need to modify the animation and/or
+            // movement behavior
+            if (this.shapeshiftercomponent.isUsingAttribute('strong')) {
+                mover.movementenabled = true;
+                if (mover.ismoving) {
+                    animator.setDefaultAnimation('push');
+                } else  {
+                    animator.setDefaultAnimation('idle');
+                }
             } else {
                 // no active attribute
                 // switch between running and idle animations as appropriate
-                if (this.shapeshiftercomponent.avatarmovementcomponent) {
-                    if (this.shapeshiftercomponent.avatarmovementcomponent.ismoving) {
-                        this.animationthunk.setDefaultAnimation('run');
-                    } else {
-                        this.animationthunk.setDefaultAnimation('idle');
-                    }
+                mover.movementenabled = true;
+                if (mover.ismoving) {
+                    animator.setDefaultAnimation('run');
+                } else {
+                    animator.setDefaultAnimation('idle');
                 }
             }
-
-        },
-
-        usingAttribute: function(attributename) {
-            this.usingattributetimeleft = 0.2;
-            this.usingattributename = attributename;
-            this.usingattribute = true;
         },
 
         setActiveFlag: function(activeflag) {
