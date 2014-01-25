@@ -44,12 +44,26 @@ pc.script.create('shapeinstance', function (context) {
 
             var mover = this.shapeshiftercomponent.avatarmovementcomponent;
             var animator = this.animationthunk;
+            var movespeed = this.movespeed;
 
             // use certain available attributes
             if (this.shapeshiftercomponent.isAttributeAvailable('strong') &&
                 _.contains(this.attributes, 'strong')) {
+
                 this.shapeshiftercomponent.useAttribute('strong');
+
+                // pushing moves at half speed
+                movespeed *= 0.5;
+
+            } else if (this.shapeshiftercomponent.isAttributeAvailable('sneaky') &&
+                _.contains(this.attributes, 'sneaky')) {
+
+                this.shapeshiftercomponent.useAttribute('sneaky');
+                // sneaking moves at half speed
+                movespeed *= 0.5;
             }
+
+            mover.movespeed = movespeed;
 
             // is an attribute active? if so, we may need to modify the animation and/or
             // movement behavior
@@ -57,6 +71,13 @@ pc.script.create('shapeinstance', function (context) {
                 mover.movementenabled = true;
                 if (mover.ismoving) {
                     animator.setDefaultAnimation('push');
+                } else  {
+                    animator.setDefaultAnimation('idle');
+                }
+            } else if (this.shapeshiftercomponent.isUsingAttribute('sneaky')) {
+                mover.movementenabled = true;
+                if (mover.ismoving) {
+                    animator.setDefaultAnimation('sneak');
                 } else  {
                     animator.setDefaultAnimation('idle');
                 }

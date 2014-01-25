@@ -35,9 +35,6 @@ pc.script.create('shapeshifter', function (context) {
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
-            if (this.activeshape) {
-            }
-
             this.updateAttributeStatus(dt);
 
             // switch shapes?
@@ -82,8 +79,6 @@ pc.script.create('shapeshifter', function (context) {
                 this.activeshape = newshapecomponent;
                 newshapecomponent.setActiveFlag(true);
 
-                this.avatarmovementcomponent.movespeed = this.activeshape.movespeed;
-
                 // trigger a spell effect when we switch shapes
                 if (this.spellglitter) {
                     this.spellglitter.enable();
@@ -112,6 +107,9 @@ pc.script.create('shapeshifter', function (context) {
         // this also calls the object that made this attribute available.
         useAttribute: function(attributename) {
             if (this.isAttributeAvailable(attributename)) {
+                if (this.usingattributetimeleft[attributename] <= 0) {
+                    this.startedUsingAttribute(attributename);
+                }
                 this.usingattributetimeleft[attributename] = attributepersisttime;
             }
         },
@@ -136,8 +134,24 @@ pc.script.create('shapeshifter', function (context) {
             _.forOwn(this.usingattributetimeleft, function(timeleft, attributename, attributes) {
                 if (timeleft > 0) {
                     attributes[attributename] = timeleft - dt;
+                    if (attributes[attributename] <= 0) {
+                        this.stoppedUsingAttribute(attributename);
+                    }
                 }
-            });
+            }, this);
+        },
+
+        startedUsingAttribute: function(attributename) {
+            switch (attributename) {
+                case 'sneaky': pc.log.write('started sneaking');
+                    break;
+                case 'strong': pc.log.write('started pushing');
+                    break;
+            }
+        },
+
+        stoppedUsingAttribute: function(attributename) {
+
         }
         
     };
