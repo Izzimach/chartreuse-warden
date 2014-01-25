@@ -3,6 +3,7 @@
 // Handles the data and animation of a specific shape available to the shapeshifter.
 //
 pc.script.attribute('movespeed','number',1);
+pc.script.attribute('attributesJSON','string','[]'');
 
 pc.script.create('shapeinstance', function (context) {
     // Creates a new Shakeycamera instance
@@ -21,7 +22,12 @@ pc.script.create('shapeinstance', function (context) {
         initialize: function () {
             this.shapename = this.entity.getName();
 
-            if (this.shapename == "BearShape") { this.attributes.push('strong'); }
+            this.attributes = JSON.parse(this.attributesJSON);
+            if (!_.isArray(this.attributes)) {
+                pc.log.warning("Warning: attributesJSON does not parse into an array in object " + this.entity.name);
+                pc.log.warning("JSON string: " + this.attributesJSON);
+                this.attributes = [];
+            }
 
             // should start off disabled
             this.disableShape();
