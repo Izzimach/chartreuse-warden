@@ -32,10 +32,6 @@ pc.script.create('animationthunk', function (context) {
         update: function (dt) {
         },
 
-        getComponentReference: function() {
-            return this;
-        },
-
         setDefaultAnimation: function(animationname) {
             if (this.defaultanimation !== animationname) {
                 this.defaultanimation = animationname;

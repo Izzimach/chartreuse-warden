@@ -7,20 +7,26 @@ pc.script.attribute('shapenamesJSON','string','["GirlShape"]');
 
 pc.script.create('shapeshifter', function (context) {
 
+    // when an attribute is available or used it persists for a short
+    // period of time. this value represents that persistant time in seconds
+    var attributepersisttime = 0.1;
+
     var ShapeShifter = function (entity) {
         this.entity = entity;
         this.shapes = {};
         this.activeshape = false;
         this.avatarmovementcomponent = null;
-        this.particlescomponent = null;
+        this.spellglitter = null;
         this.camera = null;
+        this.availableattributestimeleft = {};
+        this.usingattributetimeleft = {};
     };
 
     ShapeShifter.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
-            this.avatarmovementcomponent = this.entity.script.send('avatarmovement','getComponentReference');
-            this.particlescomponent = this.entity.script.send('torch','getComponentReference');
+            this.avatarmovementcomponent = this.entity.script.instances['avatarmovement'].instance;
+            this.spellglitter = this.entity.script.instances['spellglitter'].instance;
             this.camera = this.entity.getRoot().findByName('Camera');
             
             this.shapenames = JSON.parse(this.shapenamesJSON);
@@ -31,6 +37,8 @@ pc.script.create('shapeshifter', function (context) {
         update: function (dt) {
             if (this.activeshape) {
             }
+
+            this.updateAttributeStatus(dt);
 
             // switch shapes?
             if (context.keyboard.wasPressed(pc.input.KEY_Q)) {
@@ -75,12 +83,61 @@ pc.script.create('shapeshifter', function (context) {
                 newshapecomponent.setActiveFlag(true);
 
                 this.avatarmovementcomponent.movespeed = this.activeshape.movespeed;
-                if (this.particlescomponent) {
-                    this.particlescomponent.enable();
-                    this.particlescomponent.restart();
+
+                // trigger a spell effect when we switch shapes
+                if (this.spellglitter) {
+                    this.spellglitter.enable();
+                    this.spellglitter.restart();
                 }
-                this.camera.script.send('shakeycamera','addShake',0.3);
+                this.camera.script.shakeycamera.addShake(0.3);
             }
+        },
+
+        // other entities call this to tell the shapeshifter that it can use
+        // the specified attribute
+        setAttributeAsAvailable: function(attributename) {
+            this.availableattributestimeleft[attributename] = attributepersisttime;
+        },
+
+        isAttributeAvailable: function(attributename) {
+            if (typeof this.availableattributestimeleft[attributename] === "undefined") {
+                this.availableattributestimeleft[attributename] = 0;
+                return false;
+            }
+
+            return (this.availableattributestimeleft[attributename] > 0);
+        },
+
+        // specific shapes call this to indicate that they are using a given attribute.
+        // this also calls the object that made this attribute available.
+        useAttribute: function(attributename) {
+            if (this.isAttributeAvailable(attributename)) {
+                this.usingattributetimeleft[attributename] = attributepersisttime;
+            }
+        },
+
+        isUsingAttribute: function(attributename) {
+            if (typeof this.usingattributetimeleft[attributename] === "undefined") {
+                this.usingattributetimeleft[attributename] = 0;
+                return false;
+            }
+
+            return (this.usingattributetimeleft[attributename] > 0);
+        },
+
+        updateAttributeStatus: function(dt) {
+            // decrease the time left of all available and used attributes
+            _.forOwn(this.availableattributestimeleft, function(timeleft, attributename, attributes) {
+                if (timeleft > 0) {
+                    attributes[attributename] = timeleft - dt;
+                }
+            });
+
+            _.forOwn(this.usingattributetimeleft, function(timeleft, attributename, attributes) {
+                if (timeleft > 0) {
+                    attributes[attributename] = timeleft - dt;
+                }
+            });
         }
         
     };

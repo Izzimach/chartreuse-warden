@@ -1,17 +1,17 @@
-pc.script.create('torch', function (context) {
+pc.script.create('spellglitter', function (context) {
     
     var sharedMaterial = null;
     
-    var Torch = function (entity) {
+    var SpellGlitter = function (entity) {
         this.entity = entity;
         
         this.emitter = null;
         this.particleSystem = null;
     };
 
-    Torch.prototype = {
+    SpellGlitter.prototype = {
         initialize: function () {
-            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, positionRange: new pc.Vec3(3,4,3), colorMult: new pc.Vec4(0.2,1,0.8,1), startSize:7, endSize:1, lifeTime:0.5});
+            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, positionRange: new pc.Vec3(6,6,6), colorMult: new pc.Vec4(0.2,1,0.8,1), startSize:7, endSize:1, lifeTime:0.5});
             this.emitter.meshInstance.node = this.entity;
             
             if (sharedMaterial) {
@@ -78,5 +78,5 @@ pc.script.create('torch', function (context) {
         }
     };
 
-   return Torch;
+   return SpellGlitter;
 });

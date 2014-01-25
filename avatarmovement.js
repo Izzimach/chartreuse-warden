@@ -4,13 +4,31 @@ pc.script.create("avatarmovement", function (context) {
         this.entity = entity;
         this.movespeed = 1;
         this.ismoving = false;
+        this.movementenabled = false;
     };
  
     AvatarMovement.prototype = {
         initialize: function () {
+            // make it so that the avatar doesn't roll
+            //this.entity.rigidbody.angularFactor = 0;
+            this.movetargetvelocity = new pc.Vec3();
+            this.moveerror = new pc.Vec3();
+            this.movementenabled = true;
+        },
+
+        move: function(movetarget) {
+            this.moveerror.sub2(movetarget, this.entity.rigidbody.linearVelocity);
+            this.moveerror.scale(10);
+            this.entity.rigidbody.activate();
+            this.entity.rigidbody.applyForce(this.moveerror.x, 0, this.moveerror.z);
+            /*var newvel = new pc.Vec3(1,0,0);
+            this.entity.rigidbody.activate();
+            this.entity.rigidbody.linearVelocity = movetarget;*/
         },
  
         update: function (dt) {
+            if (!this.movementenabled) { return; }
+            
             var dx = 0;
             var dy = 0;
             var jump = false;
@@ -37,10 +55,7 @@ pc.script.create("avatarmovement", function (context) {
                 jump = true;
             }
 
-            var p = this.entity.getPosition();
-            p.x = p.x + dx * dt * this.movespeed;
-            p.z = p.z + dy * dt * this.movespeed;
-            this.entity.setPosition(p);
+            this.move(this.movetargetvelocity);
 
             // update facing based on movement direction
             this.ismoving = (dx !== 0 || dy !== 0);

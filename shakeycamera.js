@@ -29,11 +29,15 @@ pc.script.create('shakeycamera', function (context) {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
             this.followtarget = this.entity.getRoot().findByName(this.followtargetname);
-            this.followoffset = new pc.Vec3(0,this.followdistance, this.followdistance);
+            this.followoffset = new pc.Vec3();
+            this.followoffset.sub2(this.entity.getPosition(), this.followtarget.getPosition()).normalize().scale(this.followdistance);
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
+            // limit step size to (hopefully) preserve stability
+            if (dt > 0.03) { dt = 0.03; }
+
             // if following a target, update the position
             if (this.followtarget) {
                 this.baseposition.add2(this.followtarget.getLocalPosition(), this.followoffset);
@@ -45,18 +49,19 @@ pc.script.create('shakeycamera', function (context) {
             this.shakevelocity = this.shakevelocity  * shakedamping - this.shakevalue * this.shakeSpringConstant * dt;
             this.shakevalue = this.shakevalue + dt * this.shakevelocity;
 
-            var othershakevalue = this.shakevalue * Math.sin(this.shakevalue);
+            var othershakevalue = this.shakevalue * Math.cos(this.shakevalue);
             
             //pc.math.quat.fromAxisAngle(this.shakeaxis, this.shakevalue * this.shakeMagnifier, this.shakerotation);
-            this.shakerotation.setFromEulerAngles(this.shakevalue,this.shakevalue * this.shakeMagnifier,-othershakevalue);
+            this.shakerotation.setFromEulerAngles(this.shakevalue * this.shakeMagnifier,this.shakevalue * this.shakeMagnifier,-othershakevalue * this.shakeMagnifier);
             this.modifiedrotation.mul2(this.baserotation, this.shakerotation);
             
             this.entity.setLocalRotation(this.modifiedrotation);
             
-            this.shakeposition.set(0,this.shakevalue * this.shakeMagnifier, othershakevalue * this.shakeMagnifier);
+            this.shakeposition.set(-othershakevalue,this.shakevalue * this.shakeMagnifier, othershakevalue * this.shakeMagnifier);
             this.modifiedposition.add2(this.baseposition, this.shakeposition);
             
             this.entity.setLocalPosition(this.modifiedposition);
+            this.entity.lookAt(this.followtarget.getPosition());
         },
         
         addShake: function(shakeamplitude) {

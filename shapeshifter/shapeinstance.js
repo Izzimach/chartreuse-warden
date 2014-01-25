@@ -3,6 +3,7 @@
 // Handles the data and animation of a specific shape available to the shapeshifter.
 //
 pc.script.attribute('movespeed','number',1);
+pc.script.attribute('attributesJSON','string','[]'');
 
 pc.script.create('shapeinstance', function (context) {
     // Creates a new Shakeycamera instance
@@ -10,8 +11,10 @@ pc.script.create('shapeinstance', function (context) {
         this.entity = entity;
         this.shapeshiftercomponent = null;
         this.animationthunk = null;
+
         this.shapename = "";
         this.isactive = false;
+        this.attributes = [];
     };
 
     ShapeInstance.prototype = {
@@ -19,24 +22,52 @@ pc.script.create('shapeinstance', function (context) {
         initialize: function () {
             this.shapename = this.entity.getName();
 
+            this.attributes = JSON.parse(this.attributesJSON);
+            if (!_.isArray(this.attributes)) {
+                pc.log.warning("Warning: attributesJSON does not parse into an array in object " + this.entity.name);
+                pc.log.warning("JSON string: " + this.attributesJSON);
+                this.attributes = [];
+            }
+
             // should start off disabled
             this.disableShape();
 
             // the shapeshifter component should be in the parent node
-            this.animationthunk = this.entity.script.send('animationthunk','getComponentReference');
-            this.shapeshiftercomponent = this.entity.getParent().script.send('shapeshifter','addShape',this);
+            this.animationthunk = this.entity.script.animationthunk;
+            this.shapeshiftercomponent = this.entity.getParent().script.shapeshifter;
+            this.shapeshiftercomponent.addShape(this);
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
             if (!this.isactive) { return; }
 
-            // switch between running and idle animations as appropriate
-            if (this.shapeshiftercomponent.avatarmovementcomponent) {
-                if (this.shapeshiftercomponent.avatarmovementcomponent.ismoving) {
-                    this.animationthunk.setDefaultAnimation('run');
+            var mover = this.shapeshiftercomponent.avatarmovementcomponent;
+            var animator = this.animationthunk;
+
+            // use certain available attributes
+            if (this.shapeshiftercomponent.isAttributeAvailable('strong') &&
+                _.contains(this.attributes, 'strong')) {
+                this.shapeshiftercomponent.useAttribute('strong');
+            }
+
+            // is an attribute active? if so, we may need to modify the animation and/or
+            // movement behavior
+            if (this.shapeshiftercomponent.isUsingAttribute('strong')) {
+                mover.movementenabled = true;
+                if (mover.ismoving) {
+                    animator.setDefaultAnimation('push');
+                } else  {
+                    animator.setDefaultAnimation('idle');
+                }
+            } else {
+                // no active attribute
+                // switch between running and idle animations as appropriate
+                mover.movementenabled = true;
+                if (mover.ismoving) {
+                    animator.setDefaultAnimation('run');
                 } else {
-                    this.animationthunk.setDefaultAnimation('idle');
+                    animator.setDefaultAnimation('idle');
                 }
             }
         },
