@@ -142,16 +142,11 @@ pc.script.create('shapeshifter', function (context) {
         },
 
         startedUsingAttribute: function(attributename) {
-            switch (attributename) {
-                case 'sneaky': pc.log.write('started sneaking');
-                    break;
-                case 'strong': pc.log.write('started pushing');
-                    break;
-            }
+            pc.log.write('started using attribute ' + attributename);
         },
 
         stoppedUsingAttribute: function(attributename) {
-
+            pc.log.write('stopped using attribute ' + attributename);
         }
         
     };

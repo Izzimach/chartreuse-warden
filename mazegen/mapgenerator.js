@@ -10,7 +10,7 @@ chartreusewarden.generatemap = function(hexspacing, numhexes) {
 	var centerhex = curmap.newHexAt([0,0,0]);
 
 	// randomly pick a hex and add in one adjacent to it
-	for (var ix=0; ix < 5; ix++) {
+	for (var ix=0; ix < numhexes; ix++) {
 		var somehex = curmap.randomHex();
 
 		var adjhexes = _.shuffle(Hexmap.getAdjacentHexCoordinates(somehex.hexcoord));

@@ -71,6 +71,14 @@ pc.extend(chartreusewarden.Hexmap, {
 
 chartreusewarden.Hexmap.prototype = {
 
+	allHexes: function() {
+		return _.values(this.mapdata);
+	},
+
+	allHexCoords: function() {
+		return _.keys(this.mapdata);
+	},
+
 	randomHex: function() {
 		return _.sample(_.values(this.mapdata));
 	},

@@ -9,9 +9,8 @@ pc.script.create("rockobstacle", function (context) {
  
     RockObstacle.prototype = {
         initialize: function () {
-            var obstacle = this;
             this.rigidbody = this.entity.rigidbody;
-            this.entity.collision.on('contact', function(contactinfo) { obstacle.contacting(contactinfo.other); });
+            this.entity.collision.on('contact', _.bindKey(this, 'contacting'));
 
             // roll around for a few seconds to stabilize
             this.enabledtimeleft = 2.0;
@@ -31,7 +30,9 @@ pc.script.create("rockobstacle", function (context) {
             }
         },
 
-        contacting: function(otherentity) {
+        contacting: function(contactinfo) {
+            var otherentity = contactinfo.other;
+
             // if we are pushed by an entity that has the 'shapeshifter' script we can query and see if it is
             // in a shape that can push this rock
             if (typeof otherentity.script === 'undefined') { // no scripts! must be a tree or ground

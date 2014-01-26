@@ -9,8 +9,8 @@ pc.script.create("highgrass", function (context) {
         initialize: function () {
             var grassarea = this;
 
-            this.entity.collision.on('triggerenter', function(entity) { grassarea.entergrassarea(entity); });
-            this.entity.collision.on('triggerleave', function(entity) { grassarea.leavegrassarea(entity); });
+            this.entity.collision.on('triggerenter', _.bindKey(this, 'entergrassarea'));
+            this.entity.collision.on('triggerleave', _.bindKey(this, 'leavegrassarea'));
 
         },
 

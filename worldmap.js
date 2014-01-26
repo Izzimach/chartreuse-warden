@@ -1,7 +1,8 @@
 
 pc.script.create('worldmap', function (context) {
     var hexsize = 34;
-    var numhexes = 5;
+    var numhexes = 9;
+    var numobstacles = 3;
     var Hexmaplib = chartreusewarden.Hexmap;
 
     var WorldMap = function (entity) {
@@ -15,50 +16,22 @@ pc.script.create('worldmap', function (context) {
         },
 
         buildmap: function() {
-            var baserock = this.entity.findByName('rock');
-            var marker1 = this.entity.findByName('marker1');
-            var marker2 = this.entity.findByName('marker2');
-
             var worldhexes = chartreusewarden.generatemap(hexsize, numhexes);
-            var obstacledata = chartreusewarden.generateobstacles(worldhexes);
+            var obstacledata = chartreusewarden.generateobstacles(worldhexes, numobstacles);
+
+            pc.log.write(obstacledata);
 
             var entity = this.entity;
             var hexes = _.values(worldhexes.mapdata);
 
-            this.placehexes(worldhexes);
+            this.instantiateHexes(worldhexes);
 
-            this.placewalls(worldhexes);
+            this.instantiateWalls(worldhexes);
 
-            // place notations for the hexes (used for debugging)
-            _.forEach(hexes, function(hex) {
-                // mark spot with a region tag of some sort
-                if (_.some(hex.tags, function(tag) {return tag === 'reachable';})) {
-                    pc.log.write('reachable hex at ' + hex.hexcoord.toString() + ', world coord ' + hex.worldcoord.toString());
-                    var freshmarker = marker1.clone();
-                    var markercoord = hex.worldcoord.clone();
-                    markercoord.y += 1;
 
-                    this.entity.addChild(freshmarker);
-                    freshmarker.setPosition(markercoord);
-                }
-            }, this);
 
-            // place obstacles at obstacle locations
-            _.forEach(obstacledata.obstacles, function(obstacle) {
-                var hex1coord = obstacle.hex1.hexcoord;
-                var hex2coord = obstacle.hex2.hexcoord;
-                var obstaclesegment = worldhexes.convertEdgeCoordinatesToWorldEndpoints([hex1coord, hex2coord]);
-                var midpoint = obstaclesegment[0].clone().add(obstaclesegment[1]).scale(0.5);
-                midpoint.y += 2;
+            this.instantiateObstacles(worldhexes, obstacledata);
 
-                var freshobstacle = baserock.clone();
-                this.entity.addChild(freshobstacle);
-                freshobstacle.setPosition(midpoint);
-                if (freshobstacle.rigidbody) {
-                    freshobstacle.rigidbody.syncEntityToBody();
-                }
-            }, this);
-            
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
             exemplarcontainer.destroy();
@@ -73,7 +46,7 @@ pc.script.create('worldmap', function (context) {
             playerentity.rigidbody.syncEntityToBody();
         },
 
-        placehexes: function(worldhexes) {
+        instantiateHexes: function(worldhexes) {
             var hexes = _.values(worldhexes.mapdata);
             var hexobjectexemplar = this.entity.findByName('basichex');
 
@@ -100,7 +73,7 @@ pc.script.create('worldmap', function (context) {
 
         },
 
-        placewalls: function(worldhexes) {
+        instantiateWalls: function(worldhexes) {
             var hexes = _.values(worldhexes.mapdata);
             var basetree = this.entity.findByName('basictree');
 
@@ -134,9 +107,9 @@ pc.script.create('worldmap', function (context) {
             // place a tree at each wall location
             _.forEach(wallplacements, function(walllocation) {
                 var edgeendpoints = worldhexes.convertEdgeCoordinatesToWorldEndpoints(walllocation);
-                var obstaclestep = edgeendpoints[1].clone().sub(edgeendpoints[0]).scale(0.33);
+                var obstaclestep = edgeendpoints[1].clone().sub(edgeendpoints[0]).scale(0.25);
                 var walllocation1 = edgeendpoints[0].clone().add(obstaclestep);
-                var walllocation2 = walllocation1.clone().add(obstaclestep);
+                var walllocation2 = walllocation1.clone().add(obstaclestep).add(obstaclestep);
 
                 var freshwall1 = basetree.clone();
                 this.entity.addChild(freshwall1);
@@ -150,6 +123,41 @@ pc.script.create('worldmap', function (context) {
             }, this);
 
 
+        },
+
+        instantiateObstacles: function(worldhexes, obstacledata) {
+            var baserock = this.entity.findByName('rock');
+            var basekey = this.entity.findByName('marker1');
+
+            // place obstacles at obstacle locations
+            _.forEach(obstacledata.obstacles, function(obstacle) {
+                var hex1coord = obstacle.hex1.hexcoord;
+                var hex2coord = obstacle.hex2.hexcoord;
+                var obstaclesegment = worldhexes.convertEdgeCoordinatesToWorldEndpoints([hex1coord, hex2coord]);
+                var midpoint = obstaclesegment[0].clone().add(obstaclesegment[1]).scale(0.5);
+                midpoint.y += 2;
+
+                var freshobstacle = baserock.clone();
+                this.entity.addChild(freshobstacle);
+                freshobstacle.setPosition(midpoint);
+                if (freshobstacle.rigidbody) {
+                    freshobstacle.rigidbody.syncEntityToBody();
+                }
+            }, this);
+            
+            // place notations at key locations
+            _.forEach(obstacledata.obstacles, function(obstacle) {
+                var keyhex = obstacle.keyhex;
+                var keyposition = keyhex.worldcoord.clone();
+                keyposition.y += 3;
+
+                var freshkey = basekey.clone();
+                this.entity.addChild(freshkey);
+                freshkey.setPosition(keyposition);
+                if (freshkey.rigidbody) {
+                    freshkey.rigidbody.syncEntityToBody();
+                }
+            }, this);
         },
 
         // Called every frame, dt is time in seconds since last update
