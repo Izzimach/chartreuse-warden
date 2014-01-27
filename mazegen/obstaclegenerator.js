@@ -24,7 +24,7 @@ chartreusewarden.generateobstacles = (function() {
 			return; // already been here
 		}
 		hex.tags.push(name);
-		_.each(hex.connectedhexes, function (adjhex) {
+		_.forEach(hex.connectedhexes, function (adjhex) {
 			floodFillTag(adjhex, name, dontfillhex);
 		})
 	};
@@ -58,7 +58,7 @@ chartreusewarden.generateobstacles = (function() {
 
 		// check all adjacent hexes. If any are not blocked and not already
 		// found as reachable, add them and recurse
-		_.each(hex.connectedhexes, function(adjhex) {
+		_.forEach(hex.connectedhexes, function(adjhex) {
 			if (!_.contains(reachablessofar, adjhex) && !isBlockedFunc(hex,adjhex)) {
 				reachablessofar.push(adjhex);
 				findReachableHexes_recur(adjhex, isBlockedFunc, reachablessofar);

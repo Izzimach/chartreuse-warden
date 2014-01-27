@@ -6,7 +6,7 @@ pc.script.create('worldmap', function (context) {
     var Hexmaplib = chartreusewarden.Hexmap;
 
     var syncAllChildRigidBodies = function (graphnode) {
-        if (typeof graphnode.rigidbody !== 'undefined') {
+        if (!_.isUndefined(graphnode.rigidbody)) {
             graphnode.rigidbody.syncEntityToBody();
         }
 
@@ -39,7 +39,7 @@ pc.script.create('worldmap', function (context) {
 
 
 
-            this.instantiateObstacles(worldhexes, obstacledata);
+            //this.instantiateObstacles(worldhexes, obstacledata);
 
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
@@ -99,7 +99,7 @@ pc.script.create('worldmap', function (context) {
                 // if an adjacent hex exists and is connected we don't need a wall
                 _.forEach(adjhexcoords, function(adjhexcoord) {
                     var adjhex = worldhexes.getHex(adjhexcoord);
-                    var needwall =  ((typeof adjhex === "undefined") || (_.contains(hex.connectedhexes, adjhex) === false));
+                    var needwall =  ((_.isUndefined(adjhex)) || (_.contains(hex.connectedhexes, adjhex) === false));
 
                     if (needwall) {
                         var edgestring = Hexmaplib.buildEdgeCoordinate(hexcoord, adjhexcoord);

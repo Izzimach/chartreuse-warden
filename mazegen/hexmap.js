@@ -158,7 +158,7 @@ chartreusewarden.Hexmap.prototype = {
 		var hexmatches = null;
 
 		// single search term
-		if (typeof searchtag == 'string') {
+		if (_.isString(searchtag)) {
 			hexmatches = function(x) { return _.contains(x.tags, searchtag);};
 		} else {
 			hexmatches = function(x) {
@@ -176,7 +176,7 @@ chartreusewarden.Hexmap.prototype = {
 		var allhexes = _.values(this.mapdata);
 		_.each(allhexes, function(hex) {hex.distance = allhexes.length+1; });
 
-		if (typeof starthex.length === "undefined")
+		if (_.isUndefined(starthex.length))
 		{
  			// passed in a single hex
  			starthex.distance = 0;

@@ -12,7 +12,6 @@ pc.script.create('shapeinstance', function (context) {
         this.shapeshiftercomponent = null;
         this.animationthunk = null;
 
-        this.shapename = "";
         this.isactive = false;
         this.attributes = [];
     };
@@ -20,7 +19,8 @@ pc.script.create('shapeinstance', function (context) {
     ShapeInstance.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
-            this.shapename = this.entity.getName();
+            this.shapename = this.entity.name;
+            this.animationthunk = this.entity.script.animationthunk;
 
             this.attributes = JSON.parse(this.attributesJSON);
             if (!_.isArray(this.attributes)) {
@@ -31,11 +31,10 @@ pc.script.create('shapeinstance', function (context) {
 
             // should start off disabled
             this.disableShape();
+        },
 
-            // the shapeshifter component should be in the parent node
-            this.animationthunk = this.entity.script.animationthunk;
-            this.shapeshiftercomponent = this.entity.getParent().script.shapeshifter;
-            this.shapeshiftercomponent.addShape(this);
+        attachedToShifter: function (shapeshifter) {
+            this.shapeshiftercomponent = shapeshifter;
         },
 
         // Called every frame, dt is time in seconds since last update

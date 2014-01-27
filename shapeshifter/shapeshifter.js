@@ -20,21 +20,27 @@ pc.script.create('shapeshifter', function (context) {
         this.camera = null;
         this.availableattributestimeleft = {};
         this.usingattributetimeleft = {};
+        this.didinitialupdate = false;
     };
 
     ShapeShifter.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
-            this.avatarmovementcomponent = this.entity.script.instances['avatarmovement'].instance;
-            this.spellglitter = this.entity.script.instances['spellglitter'].instance;
+            this.avatarmovementcomponent = this.entity.script.avatarmovement;
+            this.spellglitter = this.entity.script.spellglitter;
             this.camera = this.entity.getRoot().findByName('Camera');
             
             this.shapenames = JSON.parse(this.shapenamesJSON);
             this.startshapename = this.shapenames[0];
+            this.didinitialupdate = false;
+
         },
 
         // Called every frame, dt is time in seconds since last update
         update: function (dt) {
+            if (!this.didinitialupdate) {
+                this.initialUpdate(dt);
+            }
             this.updateAttributeStatus(dt);
 
             // switch shapes?
@@ -55,12 +61,34 @@ pc.script.create('shapeshifter', function (context) {
             }
         },
 
-        addShape: function(shapecomponent) {
+        initialUpdate: function(dt) {
+            this.didinitialupdate = true;
+
+            var isshapeinstance = function(node) {
+                return (!_.isUndefined(node.script) && !_.isUndefined(node.script.shapeinstance));
+
+            };
+
+            var addinitialshape = function(shape) {
+                this.entity.removeChild(shape);
+                this.addShape(shape);
+            };
+
+            // pick up all children that are shape instances and add them
+            _(this.entity.getChildren())
+                .filter(isshapeinstance)
+                .forEach(addinitialshape, this);
+        },
+
+        addShape: function(shapeentity) {
+            var shapecomponent = shapeentity.script.shapeinstance;
             var shapename = shapecomponent.shapename;
+
             this.shapes[shapename] = shapecomponent;
+            shapecomponent.attachedToShifter(this);
 
             if (shapename === this.startshapename) {
-                this.switchShape(shapecomponent.shapename);
+                this.switchShape(shapename);
             }
             return this;
         },
@@ -70,13 +98,15 @@ pc.script.create('shapeshifter', function (context) {
             
             // find the new shape
             var newshapecomponent = this.shapes[shapename];
-            if (newshapecomponent) {
+            if (!_.isUndefined(newshapecomponent)) {
                 // disable old shape before switching to the new one
                 if (this.activeshape) {
                     this.activeshape.setActiveFlag(false);
+                    this.entity.removeChild(this.activeshape.entity);
                 }
 
                 this.activeshape = newshapecomponent;
+                this.entity.addChild(this.activeshape.entity);
                 newshapecomponent.setActiveFlag(true);
 
                 // trigger a spell effect when we switch shapes
@@ -95,12 +125,14 @@ pc.script.create('shapeshifter', function (context) {
         },
 
         isAttributeAvailable: function(attributename) {
-            if (typeof this.availableattributestimeleft[attributename] === "undefined") {
+            var attributetime = this.availableattributestimeleft[attributename];
+
+            if (_.isUndefined(attributetime)) {
                 this.availableattributestimeleft[attributename] = 0;
                 return false;
             }
 
-            return (this.availableattributestimeleft[attributename] > 0);
+            return (attributetime > 0);
         },
 
         // specific shapes call this to indicate that they are using a given attribute.
@@ -115,12 +147,13 @@ pc.script.create('shapeshifter', function (context) {
         },
 
         isUsingAttribute: function(attributename) {
-            if (typeof this.usingattributetimeleft[attributename] === "undefined") {
+            var attributetime = this.usingattributetimeleft[attributename];
+            if (_.isUndefined(attributetime)) {
                 this.usingattributetimeleft[attributename] = 0;
                 return false;
             }
 
-            return (this.usingattributetimeleft[attributename] > 0);
+            return (attributetime > 0);
         },
 
         updateAttributeStatus: function(dt) {
