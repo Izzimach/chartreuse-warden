@@ -6,7 +6,7 @@ pc.script.create("shapetotem", function (context) {
     var ShapeTotem = function (entity) {
         this.entity = entity;
         this.rotationangle = 0;
-        this.rotationspeed = 1; // degrees/second
+        this.rotationspeed = 25; // degrees/second
     };
  
     ShapeTotem.prototype = {
