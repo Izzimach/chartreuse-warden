@@ -5,6 +5,15 @@ pc.script.create('worldmap', function (context) {
     var numobstacles = 3;
     var Hexmaplib = chartreusewarden.Hexmap;
 
+    var syncAllChildRigidBodies = function (graphnode) {
+        if (typeof graphnode.rigidbody !== 'undefined') {
+            graphnode.rigidbody.syncEntityToBody();
+        }
+
+        var children = graphnode.getChildren();
+        _.forEach(children, syncAllChildRigidBodies);
+    };
+
     var WorldMap = function (entity) {
         this.entity = entity;
     };
@@ -54,7 +63,7 @@ pc.script.create('worldmap', function (context) {
                 var worldcoord = hex.worldcoord;
 
                 // nudge meshes up and down a little bit to avoid z-fighting of the flat ground
-                var perturbedworldcoord = new pc.Vec3(worldcoord.x, hexobjectexemplar.getPosition().y + Math.random() * 0.04 - 0.02, worldcoord.z);
+                var perturbedworldcoord = new pc.Vec3(worldcoord.x, hexobjectexemplar.getPosition().y + (Math.random() - 0.5) * 0.06, worldcoord.z);
 
                 var freshhex = hexobjectexemplar.clone();
                 this.entity.addChild(freshhex);
@@ -127,22 +136,24 @@ pc.script.create('worldmap', function (context) {
 
         instantiateObstacles: function(worldhexes, obstacledata) {
             var baserock = this.entity.findByName('rock');
+            var basicobstacle = this.entity.findByName('RockObstacle');
             var basekey = this.entity.findByName('marker1');
 
             // place obstacles at obstacle locations
             _.forEach(obstacledata.obstacles, function(obstacle) {
                 var hex1coord = obstacle.hex1.hexcoord;
                 var hex2coord = obstacle.hex2.hexcoord;
-                var obstaclesegment = worldhexes.convertEdgeCoordinatesToWorldEndpoints([hex1coord, hex2coord]);
-                var midpoint = obstaclesegment[0].clone().add(obstaclesegment[1]).scale(0.5);
-                midpoint.y += 2;
 
-                var freshobstacle = baserock.clone();
+                var placementdata = worldhexes.convertEdgeCoordinatesToPositionRotation([hex1coord, hex2coord]);
+                var position = placementdata[0];
+                var rotation = placementdata[1];
+
+                var freshobstacle = basicobstacle.clone();
                 this.entity.addChild(freshobstacle);
-                freshobstacle.setPosition(midpoint);
-                if (freshobstacle.rigidbody) {
-                    freshobstacle.rigidbody.syncEntityToBody();
-                }
+                freshobstacle.setPosition(position);
+                freshobstacle.setRotation(rotation);
+
+                syncAllChildRigidBodies(freshobstacle);
             }, this);
             
             // place notations at key locations

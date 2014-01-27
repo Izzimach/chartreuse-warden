@@ -137,6 +137,23 @@ chartreusewarden.Hexmap.prototype = {
 		return [endpoint1, endpoint2];
 	},
 
+	convertEdgeCoordinatesToPositionRotation: function(coordinates) {
+		var endpoints = this.convertEdgeCoordinatesToWorldEndpoints(coordinates);
+
+		var endpoint1 = endpoints[0];
+		var endpoint2 = endpoints[1];
+		var midpoint = endpoint1.clone().add(endpoint2).scale(0.5);
+
+		// derive angle from the vector between endpoints
+		var difference = endpoint2.clone().sub(endpoint1);
+		var Yangle = Math.atan2(-difference.z, difference.x) * 180.0/Math.PI;
+
+		var rotation = new pc.Quat();
+		rotation.setFromEulerAngles(0,Yangle,0);
+
+		return [midpoint, rotation];
+	},
+
 	findHexesWithTag: function(searchtag) {
 		var hexmatches = null;
 
