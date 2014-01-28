@@ -37,9 +37,7 @@ pc.script.create('worldmap', function (context) {
 
             this.instantiateWalls(worldhexes);
 
-
-
-            //this.instantiateObstacles(worldhexes, obstacledata);
+            this.instantiateObstacles(worldhexes, obstacledata);
 
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
@@ -135,12 +133,24 @@ pc.script.create('worldmap', function (context) {
         },
 
         instantiateObstacles: function(worldhexes, obstacledata) {
-            var baserock = this.entity.findByName('rock');
-            var basicobstacle = this.entity.findByName('RockObstacle');
-            var basekey = this.entity.findByName('marker1');
+            var exemplarnames = [
+                ['RockObstacle','BearSpirit'],
+                ['RockObstacle','BearSpirit'],
+                ['GrassObstacle','LeopardSpirit']
+            ];
+
+            var entity = this.entity;
+            var findexemplarbyname = function(exemplarname) { return entity.findByName(exemplarname); };
+
+            var obstacleexemplars = _(exemplarnames)
+                .map(function(x) { return _.map(x,findexemplarbyname); })
+                .shuffle().valueOf();
 
             // place obstacles at obstacle locations
             _.forEach(obstacledata.obstacles, function(obstacle) {
+                var currentexemplar = _.first(obstacleexemplars);
+                obstacleexemplars = _.rest(obstacleexemplars);
+
                 var hex1coord = obstacle.hex1.hexcoord;
                 var hex2coord = obstacle.hex2.hexcoord;
 
@@ -148,27 +158,25 @@ pc.script.create('worldmap', function (context) {
                 var position = placementdata[0];
                 var rotation = placementdata[1];
 
-                var freshobstacle = basicobstacle.clone();
-                this.entity.addChild(freshobstacle);
+                var freshobstacle = currentexemplar[0].clone();
+                entity.addChild(freshobstacle);
                 freshobstacle.setPosition(position);
                 freshobstacle.setRotation(rotation);
-
                 syncAllChildRigidBodies(freshobstacle);
-            }, this);
-            
-            // place notations at key locations
-            _.forEach(obstacledata.obstacles, function(obstacle) {
+
                 var keyhex = obstacle.keyhex;
+                pc.log.debug('key hex:' + keyhex.worldcoord.toString());
                 var keyposition = keyhex.worldcoord.clone();
                 keyposition.y += 3;
 
-                var freshkey = basekey.clone();
-                this.entity.addChild(freshkey);
+                var freshkey = currentexemplar[1].clone();
+                entity.addChild(freshkey);
                 freshkey.setPosition(keyposition);
-                if (freshkey.rigidbody) {
-                    freshkey.rigidbody.syncEntityToBody();
-                }
+                syncAllChildRigidBodies(freshkey);
+
             }, this);
+
+            
         },
 
         // Called every frame, dt is time in seconds since last update
