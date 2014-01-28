@@ -115,6 +115,9 @@ pc.script.create('shapeshifter', function (context) {
                     this.spellglitter.restart();
                 }
                 this.camera.script.shakeycamera.addShake(0.3);
+
+                // update renderable meshes
+                context.scene.update();
             }
         },
 

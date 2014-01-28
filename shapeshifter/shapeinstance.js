@@ -12,7 +12,7 @@ pc.script.create('shapeinstance', function (context) {
         this.shapeshiftercomponent = null;
         this.animationthunk = null;
 
-        this.isactive = false;
+        this.isactive = true;
         this.attributes = [];
     };
 
@@ -101,13 +101,20 @@ pc.script.create('shapeinstance', function (context) {
         },
 
         enableShape: function() {
+            if (this.isactive === false) {
+                context.scene.addModel(this.entity.model.model);
+
+            }
             this.isactive = true;
-            this.entity.model.setVisible(true);
+            //this.entity.model.setVisible(true);
         },
 
         disableShape: function() {
+            if (this.isactive === true) {
+                context.scene.removeModel(this.entity.model.model);
+            }
             this.isactive = false;
-            this.entity.model.setVisible(false);
+            //this.entity.model.setVisible(false);
         }
     };
 

@@ -33,6 +33,7 @@ pc.script.create("shapetotem", function (context) {
         initialUpdate: function(dt) {
             if (this.totemshape !== null) {
                 this.entity.removeChild(this.totemshape);
+                context.scene.update();
             }
             this.didinitialupdate = true;
         },
@@ -46,7 +47,6 @@ pc.script.create("shapetotem", function (context) {
             if (!_.isUndefined(shapeshifter)) {
                 // attach this to the scene graph under the shapeshifter that collided with the totem
                 //shapeshifter.entity.addChild(this.totemshape);
-                this.entity.removeChild(this.totemshape);
                 shapeshifter.addShape(this.totemshape);
                 this.totemshape = null;
             }
