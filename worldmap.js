@@ -1,8 +1,7 @@
-
 pc.script.create('worldmap', function (context) {
     var hexsize = 34;
-    var numhexes = 9;
-    var numobstacles = 3;
+    var numhexes = 6;
+    var numobstacles = 2;
     var Hexmaplib = chartreusewarden.Hexmap;
 
     var syncAllChildRigidBodies = function (graphnode) {
@@ -39,6 +38,13 @@ pc.script.create('worldmap', function (context) {
 
             this.instantiateObstacles(worldhexes, obstacledata);
 
+            // put in exit thing
+            var endhexes = worldhexes.findHexesWithTag('end');
+            var exitposition = endhexes[0].worldcoord;
+            var exitentity = this.entity.findByName('MazeExit').clone();
+            exitentity.setPosition(exitposition);
+            this.entity.addChild(exitentity);
+
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
             exemplarcontainer.destroy();
@@ -51,6 +57,8 @@ pc.script.create('worldmap', function (context) {
             var playerentity = this.entity.getRoot().findByName('Avatar');
             playerentity.setPosition(starthex.worldcoord.x, starthex.worldcoord.y + 3, starthex.worldcoord.z);
             playerentity.rigidbody.syncEntityToBody();
+
+            context.scene.update();
         },
 
         instantiateHexes: function(worldhexes) {
@@ -134,7 +142,6 @@ pc.script.create('worldmap', function (context) {
 
         instantiateObstacles: function(worldhexes, obstacledata) {
             var exemplarnames = [
-                ['RockObstacle','BearSpirit'],
                 ['RockObstacle','BearSpirit'],
                 ['GrassObstacle','LeopardSpirit']
             ];

@@ -139,7 +139,10 @@ chartreusewarden.generateobstacles = (function() {
 
 			// the last entry in the reachable hex progression contains hexes that were just made reachable.
 			// so we should stick the key in there
-			nextobstacle.keyhex = _.sample(_.last(reachablehexprogression));
+
+			// avoid placing a key in the start hex
+			var possiblekeyhexes = _.chain(reachablehexprogression).last().filter(function(hex) {return hex.distance > 0; }).valueOf();
+			nextobstacle.keyhex = _.sample(possiblekeyhexes);
 
 			// now that this obstacle is passed, hexes on the other side become reachable
 			var nextreachableregion = findReachableHexes(nextobstacle.hex2, obstaclelist);

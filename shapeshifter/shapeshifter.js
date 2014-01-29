@@ -21,6 +21,7 @@ pc.script.create('shapeshifter', function (context) {
         this.availableattributestimeleft = {};
         this.usingattributetimeleft = {};
         this.didinitialupdate = false;
+        this.shapeshiftingenabled = true;
     };
 
     ShapeShifter.prototype = {
@@ -95,6 +96,7 @@ pc.script.create('shapeshifter', function (context) {
 
         switchShape: function(shapename) {
             if (shapename === this.activeshape.shapename) { return; }
+            if (this.shapeshiftingenabled === false) { return; }
             
             // find the new shape
             var newshapecomponent = this.shapes[shapename];
