@@ -39,8 +39,8 @@ pc.script.create('worldmap', function (context) {
             this.instantiateObstacles(worldhexes, obstacledata);
 
             // put in exit thing
-            var endhexes = worldhexes.findHexesWithTag('end');
-            var exitposition = endhexes[0].worldcoord;
+            var endhex = _.chain(obstacledata.reachablesequence).last().sample().valueOf();
+            var exitposition = endhex.worldcoord;
             var exitentity = this.entity.findByName('MazeExit').clone();
             exitentity.setPosition(exitposition);
             this.entity.addChild(exitentity);

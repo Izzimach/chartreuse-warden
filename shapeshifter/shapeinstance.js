@@ -4,6 +4,8 @@
 //
 pc.script.attribute('movespeed','number',1);
 pc.script.attribute('attributesJSON','string','[]');
+pc.script.attribute('shapeiconname','string','BearFace');
+pc.script.attribute('shapeGUItitle','string');
 
 pc.script.create('shapeinstance', function (context) {
     // Creates a new Shakeycamera instance
@@ -31,6 +33,8 @@ pc.script.create('shapeinstance', function (context) {
 
             // should start off disabled
             this.disableShape();
+
+            this.GUIdata = {shapename: this.shapeGUItitle, iconname: this.shapeiconname, attributestring:this.attributes.join(',') };
         },
 
         attachedToShifter: function (shapeshifter) {

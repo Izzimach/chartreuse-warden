@@ -152,7 +152,7 @@ chartreusewarden.generateobstacles = (function() {
 			_.pull(obstacleswithoutkeys, nextobstacle);
 		}
 
-		return { obstacles: obstaclelist};
+		return { obstacles: obstaclelist, reachablesequence: reachablehexprogression };
 	}
 
 	return generator;

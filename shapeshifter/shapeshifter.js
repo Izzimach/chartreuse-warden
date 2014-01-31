@@ -22,6 +22,7 @@ pc.script.create('shapeshifter', function (context) {
         this.usingattributetimeleft = {};
         this.didinitialupdate = false;
         this.shapeshiftingenabled = true;
+        this.shapesGUI = null;
     };
 
     ShapeShifter.prototype = {
@@ -30,6 +31,7 @@ pc.script.create('shapeshifter', function (context) {
             this.avatarmovementcomponent = this.entity.script.avatarmovement;
             this.spellglitter = this.entity.script.spellglitter;
             this.camera = this.entity.getRoot().findByName('Camera');
+            this.shapesGUI = this.camera.script.shapesGUI;
             
             this.shapenames = JSON.parse(this.shapenamesJSON);
             this.startshapename = this.shapenames[0];
@@ -87,6 +89,9 @@ pc.script.create('shapeshifter', function (context) {
 
             this.shapes[shapename] = shapecomponent;
             shapecomponent.attachedToShifter(this);
+
+            this.shapesGUI.addShapeIcon({shapename:'argh',iconname:'BearFace'});
+            this.shapesGUI.addShapeIcon({shapename:'argh',iconname:'BearFace'});
 
             if (shapename === this.startshapename) {
                 this.switchShape(shapename);
