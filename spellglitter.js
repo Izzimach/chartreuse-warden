@@ -1,23 +1,30 @@
+pc.script.attribute('sharematerial','boolean',false);
+pc.script.attribute('isdynamic','boolean',false);
+pc.script.attribute('startenabled','boolean',false);
+
 pc.script.create('spellglitter', function (context) {
     
     var sharedMaterial = null;
-    
+
     var SpellGlitter = function (entity) {
         this.entity = entity;
         
         this.emitter = null;
         this.particleSystem = null;
+        this.enabled = false;
     };
 
     SpellGlitter.prototype = {
         initialize: function () {
-            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, positionRange: new pc.Vec3(6,6,6), colorMult: new pc.Vec4(0.2,1,0.8,1), startSize:7, endSize:1, lifeTime:0.5});
+            this.emitter = new pc.scene.ParticleEmitter(context.graphicsDevice, {numParticles: 50, dynamic:this.isdynamic, positionRange: new pc.Vec3(6,6,6), colorMult: new pc.Vec4(0.2,1,0.8,1), startSize:7, endSize:1, lifeTime:0.5});
             this.emitter.meshInstance.node = this.entity;
             
-            if (sharedMaterial) {
-                this.emitter.meshInstance.material = sharedMaterial;
-            } else {
-                sharedMaterial = this.emitter.meshInstance.material;
+            if (this.sharematerial) {
+                if (sharedMaterial) {
+                    this.emitter.meshInstance.material = sharedMaterial;
+                } else {
+                    sharedMaterial = this.emitter.meshInstance.material;
+                }
             }
             
             this.emitter.setColorRamp(
@@ -31,18 +38,9 @@ pc.script.create('spellglitter', function (context) {
             this.particleSystem.graph = this.entity;
             this.particleSystem.meshInstances = [ this.emitter.meshInstance ];
 
-            context.scene.addModel(this.particleSystem);
-            
-            var self = this;
-            /*var flameimage = context.assets.find('flame.jpg', 'image');
-            var texture = new pc.gfx.Texture(context.graphicsDevice);
-            texture.minFilter = pc.gfx.FILTER_LINEAR;
-            texture.magFilter = pc.gfx.FILTER_LINEAR;
-            texture.addressU = pc.gfx.ADDRESS_CLAMP_TO_EDGE;
-            texture.addressV = pc.gfx.ADDRESS_CLAMP_TO_EDGE;
-            texture.setSource(flameimage);
-
-            this.emitter.setColorMap(texture);*/
+            if (this.startenabled) {
+                this.enable();
+            }
 
             this.paused = false;
         },
@@ -66,15 +64,26 @@ pc.script.create('spellglitter', function (context) {
         },
 
         restart: function() {
+            this.enable();
             this.emitter.time = 0;
+        },
+
+        regenerate: function() {
+            this.emitter.generate(0,50);
         },
         
         enable: function () {
-            context.scene.addModel(this.particleSystem);
+            if (this.enabled === false) {
+                context.scene.addModel(this.particleSystem);
+                this.enabled = true;
+            }
         },
         
         disable: function () {
-            context.scene.removeModel(this.particleSystem);
+            if (this.enabled === true) {
+                context.scene.removeModel(this.particleSystem);
+                this.enabled = false;
+            }
         }
     };
 
