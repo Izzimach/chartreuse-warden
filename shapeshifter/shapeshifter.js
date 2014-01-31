@@ -67,6 +67,8 @@ pc.script.create('shapeshifter', function (context) {
         initialUpdate: function(dt) {
             this.didinitialupdate = true;
 
+            this.entity.script.spellglitter.dynamic = false;
+
             var isshapeinstance = function(node) {
                 return (!_.isUndefined(node.script) && !_.isUndefined(node.script.shapeinstance));
 
@@ -90,8 +92,7 @@ pc.script.create('shapeshifter', function (context) {
             this.shapes[shapename] = shapecomponent;
             shapecomponent.attachedToShifter(this);
 
-            this.shapesGUI.addShapeIcon({shapename:'argh',iconname:'BearFace'});
-            this.shapesGUI.addShapeIcon({shapename:'argh',iconname:'BearFace'});
+            this.shapesGUI.addShapeIcon(shapecomponent.GUIdata);
 
             if (shapename === this.startshapename) {
                 this.switchShape(shapename);

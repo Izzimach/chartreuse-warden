@@ -41,9 +41,10 @@ pc.script.create('worldmap', function (context) {
             // put in exit thing
             var endhex = _.chain(obstacledata.reachablesequence).last().sample().valueOf();
             var exitposition = endhex.worldcoord;
-            var exitentity = this.entity.findByName('MazeExit').clone();
-            exitentity.setPosition(exitposition);
-            this.entity.addChild(exitentity);
+            var exitentity = this.entity.findByName('MazeExit');
+            var freshexit = exitentity.clone();
+            this.entity.addChild(freshexit);
+            freshexit.setPosition(exitposition);
 
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
