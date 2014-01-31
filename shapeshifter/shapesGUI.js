@@ -11,16 +11,10 @@ pc.script.create('shapesGUI', function (context) {
         ".shapeiconframe div { position:absolute; top:50%; left:50%; margin-left:-65px; margin-top:-65px; pointer-events:none; text-align:center; color:white; width:130px; height:130px; border: 0px; background-size:130px;} " +
 
         ".shapeiconcontainer { pointer-events:none; position: absolute; left:0px; bottom:0px; width:50%; height:170px; border:0px; background:transparent; }" +
-
-        ".basicbutton { width:150px; height:80px; border: 8px solid blue; background: blue; color:white; font-size:large;77}" +
-        ".fitimage { width:60%; }" +
-        ".restartbutton { position:absolute; bottom:20%; left:0; right:0; margin:auto;}";
+        ".fitimage { width:60%; }";
 
     var ShapesGUI = function (entity) {
         this.entity = entity;
-        this.maxgesturevalue = 100;
-        this.currentgesturevalue = 100;
-        this.combatactors = {};
         this.context = context;
         this.container = document.getElementById('application-container');
     };
@@ -62,7 +56,7 @@ pc.script.create('shapesGUI', function (context) {
             var imageURL = imageasset.getFileUrl();
 
             shapeiconbox.style.backgroundImage = 'url('+imageURL+')';
-            shapeiconbox.innerHTML = '<p>' + shapedata.shapename + '</p>';
+            shapeiconbox.innerHTML = '<p>' + shapedata.shapename + '</p><p>' + shapedata.attributestring + '</p>';
 
             this.shapeiconcontainer.appendChild(shapeiconframe);
         }
