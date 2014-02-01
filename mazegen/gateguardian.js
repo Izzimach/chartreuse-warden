@@ -41,6 +41,7 @@ pc.script.create("gateguardian", function (context) {
                     // don't slam more than once when the gate closes
                     this.slamsoundenabled = false;
                     this.shakeycamera.addShake(3);
+                    this.entity.audiosource.play('slam');
                 }
             } else  {
                 // the player is gone. reopen the gate

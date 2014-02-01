@@ -124,6 +124,8 @@ pc.script.create('shapeshifter', function (context) {
                 }
                 this.camera.script.shakeycamera.addShake(0.3);
 
+                this.entity.audiosource.play('spelltwinkle');
+
                 // update renderable meshes
                 context.scene.update();
             }
@@ -187,6 +189,15 @@ pc.script.create('shapeshifter', function (context) {
 
         startedUsingAttribute: function(attributename) {
             pc.log.write('started using attribute ' + attributename);
+            // play some sounds maybe
+            switch(attributename) {
+                case 'strong':
+                    this.entity.audiosource.play('grunt');
+                    break;
+                case 'sneaky':
+                    this.entity.audiosource.play('stealthsound');
+                    break;
+            }
         },
 
         stoppedUsingAttribute: function(attributename) {
