@@ -45,6 +45,7 @@ pc.script.create('worldmap', function (context) {
             var freshexit = exitentity.clone();
             this.entity.addChild(freshexit);
             freshexit.setPosition(exitposition);
+            freshexit.script.send('spellglitter','enable');
 
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
