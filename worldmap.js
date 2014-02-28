@@ -20,7 +20,14 @@ pc.script.create('worldmap', function (context) {
     WorldMap.prototype = {
         // Called once after all resources are loaded and before the first update
         initialize: function () {
-            this.needtobuild = true;
+        },
+
+        postInitialize: function () {
+          this.buildmap();
+        },
+
+        // Called every frame, dt is time in seconds since last update
+        update: function (dt) {
         },
 
         buildmap: function() {
@@ -45,7 +52,7 @@ pc.script.create('worldmap', function (context) {
             var freshexit = exitentity.clone();
             this.entity.addChild(freshexit);
             freshexit.setPosition(exitposition);
-            freshexit.script.send('spellglitter','enable');
+            freshexit.script.enabled = true;
 
             // clear out exemplar objects
             var exemplarcontainer = this.entity.findByName('exemplars');
@@ -185,17 +192,8 @@ pc.script.create('worldmap', function (context) {
 
             }, this);
 
-            
-        },
 
-        // Called every frame, dt is time in seconds since last update
-        update: function (dt) {
-            if (this.needtobuild) {
-                this.buildmap();
-                this.needtobuild = false;
-            }
         }
-        
     };
 
     return WorldMap;

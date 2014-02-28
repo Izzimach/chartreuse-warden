@@ -32,7 +32,7 @@ pc.script.create('shapeshifter', function (context) {
             this.spellglitter = this.entity.script.spellglitter;
             this.camera = this.entity.getRoot().findByName('Camera');
             this.shapesGUI = this.camera.script.shapesGUI;
-            
+
             this.shapenames = JSON.parse(this.shapenamesJSON);
             this.startshapename = this.shapenames[0];
             this.didinitialupdate = false;
@@ -103,7 +103,7 @@ pc.script.create('shapeshifter', function (context) {
         switchShape: function(shapename) {
             if (shapename === this.activeshape.shapename) { return; }
             if (this.shapeshiftingenabled === false) { return; }
-            
+
             // find the new shape
             var newshapecomponent = this.shapes[shapename];
             if (!_.isUndefined(newshapecomponent)) {
@@ -119,7 +119,6 @@ pc.script.create('shapeshifter', function (context) {
 
                 // trigger a spell effect when we switch shapes
                 if (this.spellglitter) {
-                    this.spellglitter.enable();
                     this.spellglitter.restart();
                 }
                 this.camera.script.shakeycamera.addShake(0.3);
@@ -192,7 +191,7 @@ pc.script.create('shapeshifter', function (context) {
             // play some sounds maybe
             switch(attributename) {
                 case 'strong':
-                    this.entity.audiosource.play('grunt');
+                    this.entity.audiosource.play('grunt_lower');
                     break;
                 case 'sneaky':
                     this.entity.audiosource.play('stealthsound');
@@ -203,7 +202,7 @@ pc.script.create('shapeshifter', function (context) {
         stoppedUsingAttribute: function(attributename) {
             pc.log.write('stopped using attribute ' + attributename);
         }
-        
+
     };
 
     return ShapeShifter;

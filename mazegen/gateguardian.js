@@ -1,5 +1,5 @@
 pc.script.create("gateguardian", function (context) {
- 
+
     var GateGuardian = function (entity) {
         this.entity = entity;
         this.rigidbody = null;
@@ -15,7 +15,7 @@ pc.script.create("gateguardian", function (context) {
 
         this.workvector = new pc.Vec3();
     };
- 
+
     GateGuardian.prototype = {
         initialize: function () {
             this.rigidbody = this.entity.rigidbody;
@@ -41,7 +41,7 @@ pc.script.create("gateguardian", function (context) {
                     // don't slam more than once when the gate closes
                     this.slamsoundenabled = false;
                     this.shakeycamera.addShake(3);
-                    this.entity.audiosource.play('slam');
+                    this.entity.audiosource.play('slam_extra');
                 }
             } else  {
                 // the player is gone. reopen the gate
@@ -72,6 +72,6 @@ pc.script.create("gateguardian", function (context) {
             return false;
         }
     };
-    
+
     return GateGuardian;
 });
